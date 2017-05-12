@@ -128,6 +128,7 @@ class ApplicationController < ActionController::Base
 
   # includes services method
   # use: services.SERVICE_NAME.METHOD_NAME (e.g. services.identity.auth_projects)
+  include APIClient
   include Services
   include ServiceUser
   include CurrentUserWrapper
