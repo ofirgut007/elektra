@@ -11,69 +11,70 @@ module ResourceManagement
         super(params_or_driver)
       end
 
-      def get_project_data(domain_id, project_id=nil, options={})
-        query = prepare_filter(options)
-
-        response = handle_response do
-          expect(Net::HTTPOK) do
-            if project_id.nil?
-              if query.empty?
-                misty.resources.get_projects(domain_id)
-              else
-                misty.resources.get_projects(domain_id, query)
-              end
-            else
-              if query.empty?
-                misty.resources.get_project(domain_id, project_id)
-              else
-                misty.resources.get_project(domain_id, project_id, query)
-              end
-            end
-          end
-        end
-
-        response.body[project_id.nil? ? 'projects' : 'project']
-      end
-
-      def get_domain_data(domain_id=nil, options={})
-        query = prepare_filter(options)
-
-        response = handle_response do
-          expect(Net::HTTPOK) do
-            if domain_id.nil?
-              if query.empty?
-                misty.resources.get_domains
-              else
-                misty.resources.get_domains(query)
-              end
-            else
-              if query.empty?
-                misty.resources.get_domain(domain_id)
-              else
-                misty.resources.get_domain(domain_id,query)
-              end
-            end
-          end
-        end
-
-        response.body[domain_id.nil? ? 'domains' : 'domain']
-      end
-
-      def get_cluster_data(options={})
-        query = prepare_filter(options)
-
-        response = handle_response do
-          expect(Net::HTTPOK) do
-            if query.empty?
-              misty.resources.get_current_cluster
-            else
-              misty.resources.get_current_cluster(query)
-            end
-          end
-        end
-
-        response.body['cluster']
-      end
+#      def get_project_data(domain_id, project_id=nil, options={})
+#        query = prepare_filter(options)
+#
+#        response = handle_response do
+#          expect(Net::HTTPOK) do
+#            if project_id.nil?
+#              if query.empty?
+#                misty.resources.get_projects(domain_id)
+#              else
+#                misty.resources.get_projects(domain_id, query)
+#              end
+#            else
+#              if query.empty?
+#                misty.resources.get_project(domain_id, project_id)
+#              else
+#                misty.resources.get_project(domain_id, project_id, query)
+#              end
+#            end
+#          end
+#        end
+#
+#        response.body[project_id.nil? ? 'projects' : 'project']
+#      end
+#
+#      def get_domain_data(domain_id=nil, options={})
+#        puts "get_domain"
+#        query = prepare_filter(options)
+#
+#        response = handle_response do
+#          expect(Net::HTTPOK) do
+#            if domain_id.nil?
+#              if query.empty?
+#                api_client.resources.get_domains
+#              else
+#                misty.resources.get_domains(query)
+#              end
+#            else
+#              if query.empty?
+#                misty.resources.get_domain(domain_id)
+#              else
+#                misty.resources.get_domain(domain_id,query)
+#              end
+#            end
+#          end
+#        end
+#
+#        response.body[domain_id.nil? ? 'domains' : 'domain']
+#      end
+#
+#      def get_cluster_data(options={})
+#        query = prepare_filter(options)
+#
+#        response = handle_response do
+#          expect(Net::HTTPOK) do
+#            if query.empty?
+#              misty.resources.get_current_cluster
+#            else
+#              misty.resources.get_current_cluster(query)
+#            end
+#          end
+#        end
+#
+#        response.body['cluster']
+#      end
 
       def put_project_data(domain_id, project_id, services)
         handle_response do
@@ -99,24 +100,24 @@ module ResourceManagement
         end
       end
 
-      def sync_project_asynchronously(domain_id, project_id)
-        handle_response do
-          expect(Net::HTTPAccepted) do
-            misty.resources.sync_project(domain_id, project_id)
-          end
-        end
-        return nil
-      end
-
-      private
-
-      def prepare_filter(options)
-        query = {
-          service:  options[:services],
-          resource: options[:resources],
-        }.reject { |_,v| v.nil? }
-        return Excon::Utils.query_string(query: query).sub(/^\?/, '')
-      end
+#      def sync_project_asynchronously(domain_id, project_id)
+#        handle_response do
+#          expect(Net::HTTPAccepted) do
+#            misty.resources.sync_project(domain_id, project_id)
+#          end
+#        end
+#        return nil
+#      end
+#
+#      private
+#
+#      def prepare_filter(options)
+#        query = {
+#          service:  options[:services],
+#          resource: options[:resources],
+#        }.reject { |_,v| v.nil? }
+#        return Excon::Utils.query_string(query: query).sub(/^\?/, '')
+#      end
 
       ##########################################################################
       # error handling

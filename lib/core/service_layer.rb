@@ -88,6 +88,7 @@ module Core
           service.services     = self
           service.current_user = @current_user
           service.service_user = @service_user
+          # add the misty api_client accessor to the service object
           service.api_client   = @api_client
           # new service is instantiated -> cache it for further use in the same controller request.
           instance_variable_set("@#{method_sym.to_s}", service)
@@ -116,6 +117,15 @@ module Core
 
       def available?(action_name_sym=nil)
         false
+      end
+
+
+      def map(response,klass,additional_attributes={})
+        if response.is_a?(Array)
+          response.collect{|attributes| klass.new(api_client,attributes.merge(additional_attributes))}
+        else
+          klass.new(api_client,response.merge(additional_attributes))
+        end
       end
 
       def service_url(type, options={})

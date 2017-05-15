@@ -12,8 +12,11 @@ module ResourceManagement
 
     def index
       @domain = services.resource_management.find_domain(@scoped_domain_id)
+
       @min_updated_at = @domain.services.map(&:min_updated_at).min
       @max_updated_at = @domain.services.map(&:max_updated_at).max
+
+
 
       # find resources to show
       @critical_resources = @domain.resources.reject do |res|
