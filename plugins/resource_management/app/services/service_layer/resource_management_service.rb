@@ -2,16 +2,6 @@ module ServiceLayer
 
   class ResourceManagementService < Core::ServiceLayer::Service
 
-   # def driver
-   #   @driver ||= ResourceManagement::Driver::Misty.new(
-   #     auth_url:   self.auth_url,
-   #     region:     self.region,
-   #     token:      self.token,
-   #     domain_id:  self.domain_id,
-   #     project_id: self.project_id,
-   #   )
-   # end
-
     def available?(action_name_sym=nil)
       not current_user.service_url('resources', region: region).nil?
     end
@@ -19,72 +9,40 @@ module ServiceLayer
     def find_project(domain_id, project_id, options={})
       puts "find_project"
       query = prepare_filter(options)
-      if query.empty?
-        @response = api_client.resources.get_project(domain_id, project_id)
-      else
-        @response = api_client.resources.get_project(domain_id, project_id, query)
-      end
-      map(@response.body[project_id.nil? ? 'projects' : 'project'],ResourceManagement::Project, domain_id: domain_id)
-      #driver.map_to(ResourceManagement::Project, domain_id: domain_id).get_project_data(domain_id, project_id, options)
+      response = api_client.resources.get_project(domain_id, project_id, query)
+      map_to(ResourceManagement::Project,response.body[project_id.nil? ? 'projects' : 'project'],domain_id: domain_id)
     end
 
     def list_projects(domain_id, options={})
       puts "list_projects"
       query = prepare_filter(options)
-
-      if query.empty?
-        @response = api_client.resources.get_projects(domain_id)
-      else
-        @response = api_client.resources.get_projects(domain_id, query)
-      end
-
-      map(@response.body[project_id.nil? ? 'projects' : 'project'],ResourceManagement::Project, domain_id: domain_id)
-      #driver.map_to(ResourceManagement::Project, domain_id: domain_id).get_project_data(domain_id, nil, options)
+      response = api_client.resources.get_projects(domain_id, query)
+      map_to(ResourceManagement::Project,response.body[project_id.nil? ? 'projects' : 'project'],domain_id: domain_id)
     end
 
     def find_domain(domain_id, options={})
       puts "find_domain"
       query = prepare_filter(options)
-
-      if query.empty?
-        @response = api_client.resources.get_domain(domain_id)
-      else
-        @response = api_client.resources.get_domain(domain_id,query)
-      end
-
-      map(@response.body[domain_id.nil? ? 'domains' : 'domain'],ResourceManagement::Domain)
-      #driver.map_to(ResourceManagement::Domain).get_domain_data(domain_id, options)
+      response = api_client.resources.get_domain(domain_id,query)
+      map_to(ResourceManagement::Domain,response.body[domain_id.nil? ? 'domains' : 'domain'])
     end
 
     def list_domains(options={})
       puts "list_domains"
       query = prepare_filter(options)
-      if query.empty?
-        @response = api_client.resources.get_domains()
-      else
-        @response = api_client.resources.get_domains(query)
-      end
-
-      map(@response.body[domain_id.nil? ? 'domains' : 'domain'],ResourceManagement::Domain)
-      #driver.map_to(ResourceManagement::Domain).get_domain_data(nil, options)
+      response = api_client.resources.get_domains(query)
+      map_to(ResourceManagement::Domain,response.body[domain_id.nil? ? 'domains' : 'domain'])
     end
 
     def find_current_cluster(options={})
       puts "find_current_cluster"
       query = prepare_filter(options)
-      if query.empty?
-        @response = api_client.resources.get_current_cluster
-      else
-        @response = api_client.resources.get_current_cluster(query)
-      end
-
-      map(@response.body['cluster'],ResourceManagement::Cluster)
-      #driver.map_to(ResourceManagement::Cluster).get_cluster_data(options)
+      response = api_client.resources.get_current_cluster(query)
+      map_to(ResourceManagement::Cluster,response.body['cluster'])
     end
 
     def sync_project_asynchronously(domain_id, project_id)
       api_client.resources.sync_project(domain_id, project_id)
-      #driver.sync_project_asynchronously(domain_id, project_id)
     end
 
     def has_project_quotas?
@@ -130,16 +88,5 @@ module ServiceLayer
     rescue Core::ServiceLayer::Errors::ApiError => e
       []
     end
-
-    private
-
-    def prepare_filter(options)
-      query = {
-        service:  options[:services],
-        resource: options[:resources],
-      }.reject { |_,v| v.nil? }
-      return Excon::Utils.query_string(query: query).sub(/^\?/, '')
-    end
-
   end
 end

@@ -119,20 +119,11 @@ module Core
         false
       end
 
-      # this is used in resource management and will be deleted soon
-      def map(response,klass,additional_attributes={})
-        if response.is_a?(Array)
-          response.collect{|attributes| klass.new(api_client,attributes.merge(additional_attributes))}
-        else
-          klass.new(api_client,response.merge(additional_attributes))
-        end
-      end
-
-      def map_to(klazz,data)
+      def map_to(klazz,data,additional_attributes={})
         if data.is_a?(Array)
-          data.collect{|item| klazz.new(self,item)}
+          data.collect{|item| klazz.new(self,item.merge(additional_attributes))}
         elsif data.is_a?(Hash)
-          klazz.new(self,data)
+          klazz.new(self,data.merge(additional_attributes))
         else
           data
         end
