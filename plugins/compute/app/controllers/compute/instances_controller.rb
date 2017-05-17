@@ -9,6 +9,7 @@ module Compute
     def index
       params[:per_page]= 20
       @instances = []
+      puts "index instances"
       if @scoped_project_id
         @instances = paginatable(per_page: (params[:per_page] || 20)) do |pagination_options|
           services.compute.servers(@admin_option.merge(pagination_options))

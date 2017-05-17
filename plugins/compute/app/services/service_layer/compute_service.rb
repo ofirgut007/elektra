@@ -28,8 +28,12 @@ module ServiceLayer
     end
 
     def servers(filter={})
+      puts "servers"
       return [] unless current_user.is_allowed?('compute:instance_list')
-      driver.map_to(Compute::Server).servers(filter)
+      response = api_client.compute.list_servers_detailed(prepare_filter(filter))
+      #map(response.body['servers'],Compute::Server)
+      map_to(Compute::Server,response.body['servers'])
+      #driver.map_to(Compute::Server).servers(filter)
     end
 
     def usage(filter = {})

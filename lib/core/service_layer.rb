@@ -119,7 +119,7 @@ module Core
         false
       end
 
-
+      # this is used in resource management and will be deleted soon
       def map(response,klass,additional_attributes={})
         if response.is_a?(Array)
           response.collect{|attributes| klass.new(api_client,attributes.merge(additional_attributes))}
@@ -128,13 +128,34 @@ module Core
         end
       end
 
+      def map_to(klazz,data)
+        if data.is_a?(Array)
+          data.collect{|item| klazz.new(self,item)}
+        elsif data.is_a?(Hash)
+          klazz.new(self,data)
+        else
+          data
+        end
+      end
+
+      def prepare_filter(options)
+        query = {
+          service:  options[:services],
+          resource: options[:resources],
+        }.reject { |_,v| v.nil? }
+        return Excon::Utils.query_string(query: query).sub(/^\?/, '')
+      end
+
       def service_url(type, options={})
+        puts "service url"
         region = options[:region] || @region
         interface = options[:interface] || 'public'
 
         service = service_catalog.select do |service|
           service["type"]==type.to_s
         end.first
+
+        pp service
 
         return nil unless service
 
