@@ -155,8 +155,6 @@ module Core
           service["type"]==type.to_s
         end.first
 
-        pp service
-
         return nil unless service
 
         endpoint = service["endpoints"].select do |endpoint|
