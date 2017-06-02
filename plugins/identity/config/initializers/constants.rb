@@ -15,4 +15,5 @@ ALLOWED_ROLES = %w(
   swiftoperator
   volume_admin
   volume_viewer
+  audit_viewer
 ).freeze
