@@ -16,8 +16,6 @@ module ResourceManagement
       @min_updated_at = @domain.services.map(&:min_updated_at).min
       @max_updated_at = @domain.services.map(&:max_updated_at).max
 
-
-
       # find resources to show
       @critical_resources = @domain.resources.reject do |res|
         res.backend_quota.nil? and not res.infinite_backend_quota? and res.quota >= res.projects_quota
@@ -51,7 +49,6 @@ module ResourceManagement
 
     def update
       @domain_resource = @resource # XXX cleanup
-
       old_quota = @project_resource.quota
       begin
         new_quota = @project_resource.data_type.parse(params.require(:value))
@@ -71,12 +68,22 @@ module ResourceManagement
         return
       end
 
+      #puts "XXXX"
+      #puts @project_resource.name
+
       # set quota
       @project_resource.quota = new_quota
       unless @project_resource.save
         render text: @project_resource.errors.full_messages.to_sentence, status: :bad_request
         return
       end
+
+      # TODO: workaround, because after @project_resource.save the @project_resource is brocken so I need to load it again
+      load_project_resource
+      #puts "YYYYY"
+      #puts @project_resource.name
+      #pp @project_resource.quota
+      #puts @project_resource.project_name
 
       # make sure that row is not rendered with red background color
       @project_resource.backend_quota = nil
@@ -334,6 +341,7 @@ module ResourceManagement
         resources: [ params.require(:resource) ],
       ) or raise ActiveRecord::RecordNotFound, "project #{params[:project]} not found"
       @project_resource = project.resources.first or raise ActiveRecord::RecordNotFound, "resource not found"
+      @project_resource
     end
 
     def load_domain_resource

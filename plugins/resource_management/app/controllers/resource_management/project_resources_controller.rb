@@ -69,6 +69,10 @@ module ResourceManagement
       # save the new quota to the database
       if @resource.save
         # load data to reload the bars in the main view
+        
+        # TODO: workaround, because after @project_resource.save the @project_resource is brocken so I need to load it again
+        load_project_resource
+        
         show_area(@resource.config.service.area.to_s)
       else
         # reload the reduce quota window with error

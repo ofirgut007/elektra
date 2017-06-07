@@ -88,5 +88,43 @@ module ServiceLayer
     rescue Core::ServiceLayer::Errors::ApiError => e
       []
     end
+
+    def update_new_style_resource(id,update_attributes)
+
+      #TODO: for some reason after resource.save the resource object is brocken?
+
+      project_id        = update_attributes["project_id"] || nil
+      project_domain_id = update_attributes["project_domain_id"] || nil
+      domain_id         = update_attributes["domain_id"] || nil
+      cluster_id        = update_attributes["cluster_id"] || nil
+
+      puts "update_new_style_resource"
+      pp update_attributes
+
+      services = [{
+        type: update_attributes["service_type"],
+        resources: [{
+          name:     update_attributes["name"],
+          quota:    update_attributes["quota"],
+          capacity: update_attributes["capacity"],
+          comment:  update_attributes["comment"],
+        }.reject { |_,v| v.nil? }],
+      }]
+
+      if project_id && project_domain_id
+        puts "update project resource"
+        api_client.resources.set_quota_for_project(project_domain_id,project_id, :project => {:services => services})
+      elsif domain_id
+        puts "update domain resource"
+        api_client.resources.set_quota_for_domain(domain_id, :domain => {:services => services})
+      elsif cluster_id
+        puts "update cluster capacity"
+        api_client.resources.set_capacity_for_current_cluster(:cluster => {:services => services})
+      else
+        raise ArgumentError, "found nowhere to put quota: #{update_attributes.inspect}"
+      end
+
+    end
+
   end
 end
