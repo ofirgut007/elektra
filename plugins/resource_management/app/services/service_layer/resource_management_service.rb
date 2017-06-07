@@ -126,5 +126,14 @@ module ServiceLayer
 
     end
 
+    # this is for misty
+    def prepare_filter(options)
+      query = {
+        service:  options[:services],
+        resource: options[:resources],
+      }.reject { |_,v| v.nil? }
+      return Excon::Utils.query_string(query: query).sub(/^\?/, '')
+    end
+
   end
 end

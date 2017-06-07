@@ -129,14 +129,6 @@ module Core
         end
       end
 
-      def prepare_filter(options)
-        query = {
-          service:  options[:services],
-          resource: options[:resources],
-        }.reject { |_,v| v.nil? }
-        return Excon::Utils.query_string(query: query).sub(/^\?/, '')
-      end
-
       def service_url(type, options={})
         puts "service url"
         region = options[:region] || @region
