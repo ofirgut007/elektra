@@ -9,9 +9,9 @@ module Compute
         @fog = ::Fog::Compute::OpenStack.new(auth_params)
       end
 
-      def servers(filter={})
-        handle_response { @fog.list_servers_detail(filter).body['servers'] }
-      end
+      #def servers(filter={})
+      #  handle_response { @fog.list_servers_detail(filter).body['servers'] }
+      #end
 
       def create_server(params={})
         name = params.delete("name")
@@ -26,13 +26,13 @@ module Compute
         handle_response { @fog.create_server(name, image_ref, flavor_ref, params).body['server'] }
       end
 
-      def get_server(server_id)
-        handle_response { @fog.get_server_details(server_id).body['server'] }
-      end
+      #def get_server(server_id)
+      #  handle_response { @fog.get_server_details(server_id).body['server'] }
+      #end
 
-      def vnc_console(server_id, console_type='novnc')
-        handle_response { @fog.get_vnc_console(server_id, console_type).body['console'] }
-      end
+      #def vnc_console(server_id, console_type='novnc')
+      #  handle_response { @fog.get_vnc_console(server_id, console_type).body['console'] }
+      #end
 
       def delete_server(server_id)
         handle_response { @fog.delete_server(server_id) }
@@ -110,9 +110,9 @@ module Compute
         handle_response{@fog.remove_fixed_ip(server_id, address)}
       end
 
-      def usage(filter = {})
-        handle_response { @fog.get_limits(filter).body['limits']['absolute'] }
-      end
+      #def usage(filter = {})
+      #  handle_response { @fog.get_limits(filter).body['limits']['absolute'] }
+      #end
 
       ############################# HYPERVISORS ##############################
 

@@ -18,6 +18,7 @@ module ServiceLayer
 
 
     def volumes filter={}
+      puts "block storage service -> volumes"
       driver.map_to(BlockStorage::Volume).volumes(filter)
     end
 

@@ -10,17 +10,27 @@ module ServiceLayer
       })
     end
 
+    def prepare_filter(query)
+      return Excon::Utils.query_string(query: query).sub(/^\?/, '')
+    end
+
     def available?(action_name_sym=nil)
       not current_user.service_url('compute',region: region).nil?
     end
 
     def find_server(id)
-      return nil if id.blank?
-      driver.map_to(Compute::Server).get_server(id)
+      puts "compute-service -> find server"
+      return nil if id.empty?
+      response = api_client.compute.show_server_details(id)
+      map_to(Compute::Server,response.body['server'])
+      #driver.map_to(Compute::Server).get_server(id)
     end
 
     def vnc_console(server_id,console_type='novnc')
-      driver.map_to(Compute::VncConsole).vnc_console(server_id,console_type)
+      puts "compute-service -> vnc console"
+      response = api_client.compute.get_vnc_console_os_getvncconsole_action(server_id, "os-getVNCConsole" => {'type' => console_type } )
+      map_to(Compute::VncConsole,response.body['console'])
+      #driver.map_to(Compute::VncConsole).vnc_console(server_id,console_type)
     end
 
     def new_server(params={})
@@ -28,16 +38,18 @@ module ServiceLayer
     end
 
     def servers(filter={})
-      puts "servers"
+      puts "compute-service -> servers"
       return [] unless current_user.is_allowed?('compute:instance_list')
       response = api_client.compute.list_servers_detailed(prepare_filter(filter))
-      #map(response.body['servers'],Compute::Server)
       map_to(Compute::Server,response.body['servers'])
       #driver.map_to(Compute::Server).servers(filter)
     end
 
     def usage(filter = {})
-      driver.map_to(Compute::Usage).usage(filter)
+      puts "compute-service -> usage"
+      response = api_client.compute.show_rate_and_absolute_limits(prepare_filter(filter))
+      map_to(Compute::Usage,response.body['limits']['absolute'])
+      #driver.map_to(Compute::Usage).usage(filter)
     end
 
     ##################### HYPERVISORS #########################
