@@ -39,77 +39,77 @@ module Compute
       #  handle_response { @fog.delete_server(server_id) }
       #end
 
-      def reboot_server(server_id, type)
-        handle_response { @fog.reboot_server(server_id, type) }
-      end
-
-      def rebuild_server(server_id, image_ref, name, admin_pass=nil, metadata=nil, personality=nil)
-        handle_response { @fog.rebuild_server(server_id, image_ref, name, admin_pass, metadata, personality) }
-      end
-
-      def resize_server(server_id, flavor_ref)
-        handle_response { @fog.resize_server(server_id, flavor_ref) }
-      end
-
-      def confirm_resize_server(server_id)
-        handle_response { @fog.confirm_resize_server(server_id) }
-      end
-
-      def revert_resize_server(server_id)
-        handle_response { @fog.revert_resize_server(server_id) }
-      end
-
-      def create_image(server_id, name, metadata={})
-        handle_response { @fog.create_image(server_id, name, metadata).body['image'] }
-      end
-
-      def start_server(server_id)
-        handle_response { @fog.start_server(server_id) }
-      end
-
-      def stop_server(server_id)
-        handle_response { @fog.stop_server(server_id) }
-      end
-
-      def attach_volume(volume_id, server_id, device)
-        handle_response { @fog.attach_volume(volume_id, server_id, device) }
-      end
-
-      def detach_volume(server_id, volume_id)
-        handle_response { @fog.detach_volume(server_id, volume_id) }
-      end
-
-      def suspend_server(server_id)
-        handle_response { @fog.suspend_server(server_id) }
-      end
-
-      def pause_server(server_id)
-        handle_response { @fog.pause_server(server_id) }
-      end
-
-      def unpause_server(server_id)
-        handle_response { @fog.unpause_server(server_id) }
-      end
-
-      def reset_server_state(server_id, state)
-        handle_response { @fog.reset_server_state(server_id, state) }
-      end
-
-      def rescue_server(server_id)
-        handle_response { @fog.rescue_server(server_id) }
-      end
-
-      def resume_server(server_id)
-        handle_response { @fog.resume_server(server_id) }
-      end
-
-      def add_fixed_ip(server_id, network_id)
-        handle_response{@fog.add_fixed_ip(server_id, network_id)}
-      end
-
-      def remove_fixed_ip(server_id, address)
-        handle_response{@fog.remove_fixed_ip(server_id, address)}
-      end
+     # def reboot_server(server_id, type)
+     #   handle_response { @fog.reboot_server(server_id, type) }
+     # end
+#
+     # def rebuild_server(server_id, image_ref, name, admin_pass=nil, metadata=nil, personality=nil)
+     #   handle_response { @fog.rebuild_server(server_id, image_ref, name, admin_pass, metadata, personality) }
+     # end
+#
+     # def resize_server(server_id, flavor_ref)
+     #   handle_response { @fog.resize_server(server_id, flavor_ref) }
+     # end
+#
+     # def confirm_resize_server(server_id)
+     #   handle_response { @fog.confirm_resize_server(server_id) }
+     # end
+#
+     # def revert_resize_server(server_id)
+     #   handle_response { @fog.revert_resize_server(server_id) }
+     # end
+#
+     # def create_image(server_id, name, metadata={})
+     #   handle_response { @fog.create_image(server_id, name, metadata).body['image'] }
+     # end
+#
+     # def start_server(server_id)
+     #   handle_response { @fog.start_server(server_id) }
+     # end
+#
+     # def stop_server(server_id)
+     #   handle_response { @fog.stop_server(server_id) }
+     # end
+#
+     # def attach_volume(volume_id, server_id, device)
+     #   handle_response { @fog.attach_volume(volume_id, server_id, device) }
+     # end
+#
+     # def detach_volume(server_id, volume_id)
+     #   handle_response { @fog.detach_volume(server_id, volume_id) }
+     # end
+#
+     # def suspend_server(server_id)
+     #   handle_response { @fog.suspend_server(server_id) }
+     # end
+#
+     # def pause_server(server_id)
+     #   handle_response { @fog.pause_server(server_id) }
+     # end
+#
+     # def unpause_server(server_id)
+     #   handle_response { @fog.unpause_server(server_id) }
+     # end
+#
+     # def reset_server_state(server_id, state)
+     #   handle_response { @fog.reset_server_state(server_id, state) }
+     # end
+#
+     # def rescue_server(server_id)
+     #   handle_response { @fog.rescue_server(server_id) }
+     # end
+#
+     # def resume_server(server_id)
+     #   handle_response { @fog.resume_server(server_id) }
+     # end
+#
+     # def add_fixed_ip(server_id, network_id)
+     #   handle_response{@fog.add_fixed_ip(server_id, network_id)}
+     # end
+#
+     # def remove_fixed_ip(server_id, address)
+     #   handle_response{@fog.remove_fixed_ip(server_id, address)}
+     # end
 
       #def usage(filter = {})
       #  handle_response { @fog.get_limits(filter).body['limits']['absolute'] }
@@ -168,13 +168,13 @@ module Compute
       end
 
       ########################### FLAVORS #############################
-      def flavors(filter={})
-        handle_response { @fog.list_flavors_detail(filter).body['flavors'] }
-      end
+      #def flavors(filter={})
+      #  handle_response { @fog.list_flavors_detail(filter).body['flavors'] }
+      #end
 
-      def get_flavor(flavor_id)
-        handle_response { @fog.get_flavor_details(flavor_id).body['flavor'] }
-      end
+      #def get_flavor(flavor_id)
+      #  handle_response { @fog.get_flavor_details(flavor_id).body['flavor'] }
+      #end
 
       def delete_flavor(id)
         handle_response {

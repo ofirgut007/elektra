@@ -129,6 +129,10 @@ module Core
         end
       end
 
+      def debug(message)
+         puts message if ENV['SERVICE_LAYER_DEBUG']
+      end
+
       def service_url(type, options={})
         puts "service url"
         region = options[:region] || @region

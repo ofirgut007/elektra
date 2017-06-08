@@ -123,12 +123,7 @@ module Compute
       id = self.flavor["id"]
       return nil if id.blank?
 
-      flavor = Rails.cache.fetch("server_flavor_#{id}", expires_in: 24.hours) do
-        @driver.get_flavor(id) rescue nil
-      end
-      return nil if flavor.nil?
-      @flavor_object = Compute::Flavor.new(self.driver,flavor)
-
+      @driver.flavor(id,true) rescue nil
     end
 
     def image_object
