@@ -23,18 +23,59 @@ module ServiceLayer
       return nil if id.empty?
       response = api_client.compute.show_server_details(id)
       map_to(Compute::Server,response.body['server'])
-      #driver.map_to(Compute::Server).get_server(id)
     end
 
     def vnc_console(server_id,console_type='novnc')
       puts "compute-service -> vnc console"
-      response = api_client.compute.get_vnc_console_os_getvncconsole_action(server_id, "os-getVNCConsole" => {'type' => console_type } )
+      response = api_client.compute.get_vnc_console_os_getvncconsole_action(
+        server_id,
+        "os-getVNCConsole" => {'type' => console_type }
+      )
       map_to(Compute::VncConsole,response.body['console'])
-      #driver.map_to(Compute::VncConsole).vnc_console(server_id,console_type)
     end
 
     def new_server(params={})
-      Compute::Server.new(driver,params)
+      puts "compute-service -> new server model"
+      Compute::Server.new(self,params)
+    end
+
+    def create_server(params={})
+      puts "compute-service -> create server"
+      pp params
+
+      name       = params.delete("name")
+      flavor_ref = params.delete("flavorRef")
+      params["server"] = {
+              'flavorRef' => flavor_ref,
+              'name'      => name
+      }
+
+      image_ref = params.delete("imageRef")
+      params['server']['imageRef'] = image_ref if image_ref
+
+      params["max_count"]=params["max_count"].to_i if params["max_count"]
+      params["min_count"]=params["min_count"].to_i if params["min_count"]
+      if networks=params.delete("networks")
+       nics=networks.collect { |n| {'net_id' => n["id"], 'v4_fixed_ip' => n['fixed_ip'], 'port_id' => n['port']} }
+       # ripped from https://github.com/fog/fog-openstack/blob/master/lib/fog/compute/openstack/requests/create_server.rb#L45-L54
+       if nics
+        params['server']['networks'] =
+          Array(nics).map do |nic|
+            neti = {}
+            neti['uuid']     = (nic['net_id']      || nic[:net_id])      unless (nic['net_id']      || nic[:net_id]).nil?
+            neti['fixed_ip'] = (nic['v4_fixed_ip'] || nic[:v4_fixed_ip]) unless (nic['v4_fixed_ip'] || nic[:v4_fixed_ip]).nil?
+            neti['port']     = (nic['port_id']     || nic[:port_id])     unless (nic['port_id']     || nic[:port_id]).nil?
+            neti
+          end
+       end
+      end
+
+      api_client.compute.create_server(params).body['server']
+    end
+
+    def delete_server(server_id)
+      puts "compute-service -> delete server"
+      api_client.compute.delete_server(server_id)
     end
 
     def servers(filter={})
@@ -42,14 +83,12 @@ module ServiceLayer
       return [] unless current_user.is_allowed?('compute:instance_list')
       response = api_client.compute.list_servers_detailed(prepare_filter(filter))
       map_to(Compute::Server,response.body['servers'])
-      #driver.map_to(Compute::Server).servers(filter)
     end
 
     def usage(filter = {})
       puts "compute-service -> usage"
       response = api_client.compute.show_rate_and_absolute_limits(prepare_filter(filter))
       map_to(Compute::Usage,response.body['limits']['absolute'])
-      #driver.map_to(Compute::Usage).usage(filter)
     end
 
     ##################### HYPERVISORS #########################

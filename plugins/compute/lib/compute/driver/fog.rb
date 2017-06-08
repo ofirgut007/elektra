@@ -13,18 +13,19 @@ module Compute
       #  handle_response { @fog.list_servers_detail(filter).body['servers'] }
       #end
 
-      def create_server(params={})
-        name = params.delete("name")
-        image_ref = params.delete("imageRef")
-        flavor_ref = params.delete("flavorRef")
-        params["max_count"]=params["max_count"].to_i if params["max_count"]
-        params["min_count"]=params["min_count"].to_i if params["min_count"]
-        if networks=params.delete("networks")
-          params["nics"]=networks.collect { |n| {'net_id' => n["id"], 'v4_fixed_ip' => n['fixed_ip'], 'port_id' => n['port']} }
-        end
-
-        handle_response { @fog.create_server(name, image_ref, flavor_ref, params).body['server'] }
-      end
+      #def create_server(params={})
+      #  pp params
+      #  name = params.delete("name")
+      #  image_ref = params.delete("imageRef")
+      #  flavor_ref = params.delete("flavorRef")
+      #  params["max_count"]=params["max_count"].to_i if params["max_count"]
+      #  params["min_count"]=params["min_count"].to_i if params["min_count"]
+      #  if networks=params.delete("networks")
+      #    params["nics"]=networks.collect { |n| {'net_id' => n["id"], 'v4_fixed_ip' => n['fixed_ip'], 'port_id' => n['port']} }
+      #  end
+      #
+      #  handle_response { @fog.create_server(name, image_ref, flavor_ref, params).body['server'] }
+      #end
 
       #def get_server(server_id)
       #  handle_response { @fog.get_server_details(server_id).body['server'] }
@@ -34,9 +35,9 @@ module Compute
       #  handle_response { @fog.get_vnc_console(server_id, console_type).body['console'] }
       #end
 
-      def delete_server(server_id)
-        handle_response { @fog.delete_server(server_id) }
-      end
+      #def delete_server(server_id)
+      #  handle_response { @fog.delete_server(server_id) }
+      #end
 
       def reboot_server(server_id, type)
         handle_response { @fog.reboot_server(server_id, type) }
