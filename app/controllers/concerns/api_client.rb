@@ -6,8 +6,7 @@ module APIClient
   def api_client
     return nil unless current_user
     # initialize api_client unless already initialized
-    puts "api_client"
-    puts current_user.service_url('identity', {region: current_region, interface: 'public'})
+    puts "api-client -> api_client" if ENV['SERVICE_LAYER_DEBUG']
     return nil unless current_user.service_url('identity', {region: current_region, interface: 'public'})
 
     @misty_cloud ||= ::Misty::Cloud.new(
@@ -16,7 +15,6 @@ module APIClient
       ssl_verify_mode: Rails.configuration.ssl_verify_peer,
       http_proxy:      ENV['http_proxy'],
     )
-
   end
 
   def misty_auth_params

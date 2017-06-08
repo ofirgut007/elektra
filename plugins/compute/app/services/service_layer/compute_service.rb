@@ -269,7 +269,6 @@ module ServiceLayer
 
       return nil if flavor_data.nil?
       Compute::Flavor.new(self,flavor_data)
-
     end
 
     def flavors(filter={})

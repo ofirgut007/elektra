@@ -5,14 +5,14 @@ module Core
       # e.g. list_domains -> [Indentity::Domain], get_domain -> Indentity::Domain
       class Mapper
         def initialize(driver,klass,additional_attributes={})
-          puts "mapper init"
+          puts "driver -> mapper -> init" if ENV['DRIVER_LAYER_DEBUG']
           @driver=driver
           @klass=klass
           @additional_attributes = additional_attributes
         end
 
         def map(response)
-          puts "mapper map"
+          puts "driver -> mapper -> map" if ENV['DRIVER_LAYER_DEBUG']
           if response.is_a?(Array)
             response.collect{|attributes| @klass.new(@driver,attributes.merge(@additional_attributes))}
           elsif response.is_a?(Hash)
@@ -23,7 +23,7 @@ module Core
         end
 
         def method_missing(method_sym, *arguments, &block)
-          puts "mapper method_missing"
+          puts "driver -> mapper -> method_missing" if ENV['DRIVER_LAYER_DEBUG']
           if arguments.count>0
             map(@driver.send(method_sym, *arguments, &block))
           else
@@ -36,7 +36,7 @@ module Core
       # TODO catch other errors (depending on driver)
       class Base
         def initialize(params={})
-          puts "base init"
+          puts "driver -> base -> init" if ENV['DRIVER_LAYER_DEBUG']
           @auth_url       = params[:auth_url]
           @region         = params[:region]
           @token          = params[:token]
@@ -45,7 +45,7 @@ module Core
         end
 
         def handle_response(&block)
-          puts "base handle_response"
+          puts "driver -> base -> handle_response" if ENV['DRIVER_LAYER_DEBUG']
           response = block.call
           return nil unless response
 
@@ -62,7 +62,7 @@ module Core
 
         # use a mapper for response
         def map_to(klass, additional_attributes={})
-          puts "base map_to"
+          puts "driver -> base -> map_to" if ENV['DRIVER_LAYER_DEBUG']
           unless (klass<=Core::ServiceLayer::Model)
             raise Core::ServiceLayer::Errors::BadMapperClass.new("#{klass} is not a subclass of Core::ServiceLayer::Model")
           end

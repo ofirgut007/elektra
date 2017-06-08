@@ -52,6 +52,14 @@ Rails.application.configure do
     puts "=> Trusted IP #{ENV['TRUSTED_IP']}"
   end
 
+  if ENV['SERVICE_LAYER_DEBUG']
+    puts "=> Debug servicelayer #{ENV['SERVICE_LAYER_DEBUG']}"
+  end
+
+  if ENV['DRIVER_LAYER_DEBUG']
+    puts "=> Debug driverlayer #{ENV['DRIVER_LAYER_DEBUG']}"
+  end
+
   # Mailer configuration for inquiries/requests
   config.action_mailer.perform_deliveries = false
 
