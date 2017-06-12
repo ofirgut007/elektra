@@ -233,9 +233,9 @@ module BlockStorage
     private
 
     def get_cached_servers
-      Rails.cache.fetch("#{@scoped_project_id}_servers", expires_in: 2.hours) do
-        services.compute.servers
-      end
+      #Rails.cache.fetch("#{@scoped_project_id}_servers", expires_in: 2.hours) do
+        services.compute.servers({},true)
+      #end
     end
 
     # Use callbacks to share common setup or constraints between actions.

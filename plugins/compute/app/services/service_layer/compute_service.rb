@@ -78,11 +78,22 @@ module ServiceLayer
       api_client.compute.delete_server(server_id)
     end
 
-    def servers(filter={})
+    def servers(filter={},use_cache = false)
       debug "[compute-service] -> servers -> GET servers/detail"
       return [] unless current_user.is_allowed?('compute:instance_list')
-      response = api_client.compute.list_servers_detailed(prepare_filter(filter))
-      map_to(Compute::Server,response.body['servers'])
+
+      server_data = nil
+      unless use_cache
+        server_data = api_client.compute.list_servers_detailed(prepare_filter(filter)).body['servers']
+        Rails.cache.write("#{@scoped_project_id}_servers",server_data, expires_in: 2.hours)
+      else
+        server_data = Rails.cache.fetch("#{@scoped_project_id}_servers", expires_in: 2.hours) do
+          api_client.compute.list_servers_detailed(prepare_filter(filter)).body['servers']
+        end
+      end
+
+       map_to(Compute::Server,server_data)
+
     end
 
     def usage(filter = {})
@@ -206,57 +217,67 @@ module ServiceLayer
     ##################### HYPERVISORS #########################
 
     def hypervisors(filter = {})
+      debug "[compute-service] -> hypervisors"
       driver.map_to(Compute::Hypervisor).hypervisors(filter)
     end
 
     def find_hypervisor(id)
+      debug "[compute-service] -> find_hypervisor"
       return nil if id.blank?
       driver.map_to(Compute::Hypervisor).get_hypervisor(id)
     end
 
     def hypervisor_servers(id)
+      debug "[compute-service] -> hypervisor_servers"
       driver.map_to(Compute::HypervisorServer).hypervisor_servers(id)
     end
 
     ##################### SERVICES #########################
 
     def services(filter = {})
+      debug "[compute-service] -> services"
       driver.map_to(Compute::Service).services(filter)
     end
 
     ##################### HOST AGGREGATES #########################
 
     def host_aggregates(filter = {})
+      debug "[compute-service] -> host_aggregates"
       driver.map_to(Compute::HostAggregate).host_aggregates(filter)
     end
 
     def images
+      debug "[compute-service] -> images"
       driver.map_to(Compute::Image).images
     end
 
     def image(id)
+      debug "[compute-service] -> image"
       driver.map_to(Compute::Image).get_image(id) rescue nil
     end
 
     def new_os_interface(server_id,attributes={})
+      debug "[compute-service] -> new_os_interface"
       os_interface = Compute::OsInterface.new(driver,attributes)
       os_interface.server_id = server_id
       os_interface
     end
 
     def server_os_interfaces(server_id)
+      debug "[compute-service] -> server_os_interfaces"
       driver.map_to(Compute::OsInterface).list_os_interfaces(server_id)
     end
 
     def new_flavor(params={})
+      debug "[compute-service] -> new_flavor"
       Compute::Flavor.new(driver,params)
     end
 
-    def flavor(flavor_id,use_cached = false)
+    def flavor(flavor_id,use_cache = false)
       debug "[compute-service] -> flavor -> GET /flavors/#{flavor_id}"
 
       flavor_data = nil
-      unless use_cached
+      unless use_cache
         flavor_data = api_client.compute.show_flavor_details(flavor_id).body['flavor']
         Rails.cache.write("server_flavor_#{flavor_id}",flavor_data, expires_in: 24.hours)
       else
@@ -276,53 +297,65 @@ module ServiceLayer
     end
 
     def security_groups_details(security_group_id)
+      debug "[compute-service] -> security_groups_details"
       driver.map_to(Networking::SecurityGroup).server_security_groups security_group_id
     end
 
     def flavor_members(flavor_id)
+      debug "[compute-service] -> flavor_members"
       driver.map_to(Compute::FlavorAccess).list_flavor_members(flavor_id)
     end
 
     def flavor_metadata(flavor_id)
+      debug "[compute-service] -> flavor_metadata"
       driver.map_to(Compute::FlavorMetadata).get_flavor_metadata(flavor_id)
     end
 
     def new_flavor_metadata(flavor_id)
+      debug "[compute-service] -> new_flavor_metadata"
       Compute::FlavorMetadata.new(driver, flavor_id: flavor_id)
     end
 
     def new_flavor_access(params={})
+      debug "[compute-service] -> new_flavor_access"
       Compute::FlavorAccess.new(driver,params)
     end
 
     def availability_zones
+      debug "[compute-service] -> availability_zones"
       driver.map_to(Compute::AvailabilityZone).availability_zones
     end
 
     def attach_volume(volume_id, server_id, device)
+      debug "[compute-service] -> attach_volume"
       driver.attach_volume(volume_id, server_id, device)
     end
 
     def detach_volume(volume_id, server_id)
+      debug "[compute-service] -> detach_volume"
       driver.detach_volume(server_id, volume_id)
     end
 
     ##################### KEYPAIRS #########################
     def new_keypair(attributes={})
+      debug "[compute-service] -> new_keypair"
       Compute::Keypair.new(driver, attributes)
     end
 
     def find_keypair(name=nil)
+      debug "[compute-service] -> find_keypair"
       return nil if name.blank?
       driver.map_to(Compute::Keypair).get_keypair(name)
     end
 
     def delete_keypair(name=nil)
+      debug "[compute-service] -> delete_keypair"
       return nil if name.blank?
       driver.map_to(Compute::Keypair).delete_keypair(name)
     end
 
     def keypairs(options={})
+      debug "[compute-service] -> keypairs"
       # keypair structure different to others, so manual effort needed
       unless @user_keypairs
         @user_keypairs = []
