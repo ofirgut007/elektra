@@ -134,7 +134,6 @@ module Core
       end
 
       def service_url(type, options={})
-        puts "service url"
         region = options[:region] || @region
         interface = options[:interface] || 'public'
 

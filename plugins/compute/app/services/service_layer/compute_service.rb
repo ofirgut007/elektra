@@ -19,14 +19,14 @@ module ServiceLayer
     end
 
     def find_server(id)
-      debug "compute-service -> find_server -> GET /servers/#{id}"
+      debug "[compute-service] -> find_server -> GET /servers/#{id}"
       return nil if id.empty?
       response = api_client.compute.show_server_details(id)
       map_to(Compute::Server,response.body['server'])
     end
 
     def vnc_console(server_id,console_type='novnc')
-      debug "compute-service -> vnc_console -> POST /action"
+      debug "[compute-service] -> vnc_console -> POST /action"
       response = api_client.compute.get_vnc_console_os_getvncconsole_action(
         server_id,
         "os-getVNCConsole" => {'type' => console_type }
@@ -35,12 +35,12 @@ module ServiceLayer
     end
 
     def new_server(params={})
-      debug "compute-service -> new_server"
+      debug "[compute-service] -> new_server"
       Compute::Server.new(self,params)
     end
 
     def create_server(params={})
-      debug "compute-service -> create_server -> POST /servers"
+      debug "[compute-service] -> create_server -> POST /servers"
       debug params
 
       name       = params.delete("name")
@@ -74,25 +74,25 @@ module ServiceLayer
     end
 
     def delete_server(server_id)
-      debug "compute-service -> delete_server -> DELETE /servers/#{server_id}"
+      debug "[compute-service] -> delete_server -> DELETE /servers/#{server_id}"
       api_client.compute.delete_server(server_id)
     end
 
     def servers(filter={})
-      debug "compute-service -> servers -> GET servers/detail"
+      debug "[compute-service] -> servers -> GET servers/detail"
       return [] unless current_user.is_allowed?('compute:instance_list')
       response = api_client.compute.list_servers_detailed(prepare_filter(filter))
       map_to(Compute::Server,response.body['servers'])
     end
 
     def usage(filter = {})
-      debug "compute-service -> usage -> GET /limits"
+      debug "[compute-service] -> usage -> GET /limits"
       response = api_client.compute.show_rate_and_absolute_limits(prepare_filter(filter))
       map_to(Compute::Usage,response.body['limits']['absolute'])
     end
 
     def rebuild_server(server_id, image_ref, name, admin_pass=nil, metadata=nil, personality=nil)
-      debug "compute-service -> rebuild_server -> POST /action"
+      debug "[compute-service] -> rebuild_server -> POST /action"
 
       # prepare data
       # based on https://github.com/fog/fog-openstack/blob/master/lib/fog/compute/openstack/requests/rebuild_server.rb
@@ -116,37 +116,37 @@ module ServiceLayer
     end
 
     def resize_server(server_id, flavor_ref)
-      debug "compute-service -> resize_server -> POST /servers/#{server_id}/action"
+      debug "[compute-service] -> resize_server -> POST /servers/#{server_id}/action"
       api_client.compute.resize_server_resize_action(server_id, 'resize' => {'flavorRef' => flavor_ref})
     end
 
     def confirm_resize_server(server_id)
-      debug "compute-service -> confirm_resize_server -> POST /servers/#{server_id}/action"
+      debug "[compute-service] -> confirm_resize_server -> POST /servers/#{server_id}/action"
       api_client.compute.confirm_resized_server_confirmresize_action(server_id, 'confirmResize' => nil)
     end
 
     def revert_resize_server(server_id)
-      debug "compute-service -> revert_resize_server -> POST /servers/#{server_id}/action"
+      debug "[compute-service] -> revert_resize_server -> POST /servers/#{server_id}/action"
       api_client.compute.revert_resized_server_revertresize_action(server_id, 'revertResize' => nil)
     end
 
     def create_image(server_id, name, metadata={})
-      debug "compute-service -> create_image -> POST /action"
+      debug "[compute-service] -> create_image -> POST /action"
       #handle_response { @fog.create_image(server_id, name, metadata).body['image'] }
     end
 
     def start_server(server_id)
-      debug "compute-service -> start_server -> POST /servers/#{server_id}/action"
+      debug "[compute-service] -> start_server -> POST /servers/#{server_id}/action"
       api_client.compute.start_server_os_start_action(server_id, 'os-start' => nil)
     end
 
     def stop_server(server_id)
-      debug "compute-service -> stop_server -> POST /servers/#{server_id}/action"
+      debug "[compute-service] -> stop_server -> POST /servers/#{server_id}/action"
        api_client.compute.stop_server_os_stop_action(server_id, 'os-stop' => nil)
     end
 
     def reboot_server(server_id, type)
-      debug "compute-service -> reboot_server ->  /servers/#{server_id}/action"
+      debug "[compute-service] -> reboot_server ->  /servers/#{server_id}/action"
       api_client.compute.reboot_server_reboot_action(
         server_id,
         'reboot' => {'type' => type}
@@ -154,52 +154,52 @@ module ServiceLayer
     end
 
     def attach_volume(volume_id, server_id, device)
-      debug "compute-service -> attach_volume -> POST /action"
+      debug "[compute-service] -> attach_volume -> POST /action"
       #handle_response { @fog.attach_volume(volume_id, server_id, device) }
     end
 
     def detach_volume(server_id, volume_id)
-      debug "compute-service -> detach_volume -> POST /action"
+      debug "[compute-service] -> detach_volume -> POST /action"
       #handle_response { @fog.detach_volume(server_id, volume_id) }
     end
 
     def suspend_server(server_id)
-      debug "compute-service -> suspend_server -> POST /servers/#{server_id}/action"
+      debug "[compute-service] -> suspend_server -> POST /servers/#{server_id}/action"
       api_client.compute.suspend_server_suspend_action(server_id, 'suspend' => nil)
     end
 
     def pause_server(server_id)
-      debug "compute-service -> pause_server -> POST /servers/#{server_id}/action"
+      debug "[compute-service] -> pause_server -> POST /servers/#{server_id}/action"
       api_client.compute.pause_server_pause_action(server_id, 'pause' => nil)
     end
 
     def unpause_server(server_id)
-      debug "compute-service -> unpause_server -> POST /action"
+      debug "[compute-service] -> unpause_server -> POST /action"
       api_client.compute.unpause_server_unpause_action(server_id, 'unpause' => nil)
     end
 
     def reset_server_state(server_id, state)
-      debug "compute-service -> reset_server_state -> POST /servers/#{server_id}/action"
+      debug "[compute-service] -> reset_server_state -> POST /servers/#{server_id}/action"
       api_client.compute.reset_server_state_os_resetstate_action(server_id, 'os-resetState' => {'state' => state})
     end
 
     def rescue_server(server_id)
-      debug "compute-service -> rescue_server -> POST /servers/#{server_id}/action"
+      debug "[compute-service] -> rescue_server -> POST /servers/#{server_id}/action"
       api_client.compute.rescue_server_rescue_action(server_id, 'rescue' => nil)
     end
 
     def resume_server(server_id)
-      debug "compute-service -> resume_server -> POST /servers/#{server_id}/action"
+      debug "[compute-service] -> resume_server -> POST /servers/#{server_id}/action"
       api_client.compute.resume_suspended_server_resume_action(server_id, 'resume' => nil)
     end
 
     def add_fixed_ip(server_id, network_id)
-      debug "compute-service -> add_fixed_ip -> POST /action"
+      debug "[compute-service] -> add_fixed_ip -> POST /action"
       #handle_response{@fog.add_fixed_ip(server_id, network_id)}
     end
 
     def remove_fixed_ip(server_id, address)
-      debug "compute-service -> remove_fixed_ip -> POST /action"
+      debug "[compute-service] -> remove_fixed_ip -> POST /action"
       #handle_response{@fog.remove_fixed_ip(server_id, address)}
     end
 
@@ -255,7 +255,7 @@ module ServiceLayer
     end
 
     def flavor(flavor_id,use_cached = false)
-      debug "compute-service -> flavor -> GET /flavors/#{flavor_id}"
+      debug "[compute-service] -> flavor -> GET /flavors/#{flavor_id}"
 
       flavor_data = nil
       unless use_cached
@@ -272,7 +272,7 @@ module ServiceLayer
     end
 
     def flavors(filter={})
-      debug "compute-service -> flavors -> GET /flavors/detail"
+      debug "[compute-service] -> flavors -> GET /flavors/detail"
       response = api_client.compute.list_flavors_with_details(prepare_filter(filter))
       map_to(Compute::Flavor, response.body['flavors'])
     end
