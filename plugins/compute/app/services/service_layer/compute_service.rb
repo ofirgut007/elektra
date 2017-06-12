@@ -124,82 +124,82 @@ module ServiceLayer
     end
 
     def resize_server(server_id, flavor_ref)
-      debug "compute-service -> resize_server -> POST /action"
-      #handle_response { @fog.resize_server(server_id, flavor_ref) }
+      debug "compute-service -> resize_server -> POST /servers/#{server_id}/action"
+      api_client.compute.resize_server_resize_action(server_id, 'resize' => {'flavorRef' => flavor_ref})
     end
 
     def confirm_resize_server(server_id)
-      debug "compute-service -> api call confirm resize server"
-      #handle_response { @fog.confirm_resize_server(server_id) }
+      debug "compute-service -> confirm_resize_server -> POST /servers/#{server_id}/action"
+      api_client.compute.confirm_resized_server_confirmresize_action(server_id, 'confirmResize' => nil)
     end
 
     def revert_resize_server(server_id)
-      debug "compute-service -> api call usage"
-      #handle_response { @fog.revert_resize_server(server_id) }
+      debug "compute-service -> revert_resize_server -> POST /servers/#{server_id}/action"
+      api_client.compute.revert_resized_server_revertresize_action(server_id, 'revertResize' => nil)
     end
 
     def create_image(server_id, name, metadata={})
-      debug "compute-service -> api call usage"
+      debug "compute-service -> create_image -> POST /action"
       #handle_response { @fog.create_image(server_id, name, metadata).body['image'] }
     end
 
     def start_server(server_id)
-      debug "compute-service -> api call usage"
+      debug "compute-service -> start_server -> POST /servers/#{server_id}/action"
       #handle_response { @fog.start_server(server_id) }
     end
 
     def stop_server(server_id)
-      debug "compute-service -> api call usage"
+      debug "compute-service -> stop_server -> POST /servers/#{server_id}/action"
       #handle_response { @fog.stop_server(server_id) }
     end
 
     def attach_volume(volume_id, server_id, device)
-      debug "compute-service -> api call usage"
+      debug "compute-service -> attach_volume -> POST /action"
       #handle_response { @fog.attach_volume(volume_id, server_id, device) }
     end
 
     def detach_volume(server_id, volume_id)
-      debug "compute-service -> api call usage"
+      debug "compute-service -> detach_volume -> POST /action"
       #handle_response { @fog.detach_volume(server_id, volume_id) }
     end
 
     def suspend_server(server_id)
-      debug "compute-service -> api call usage"
+      debug "compute-service -> suspend_server -> POST /servers/#{server_id}/action"
       #handle_response { @fog.suspend_server(server_id) }
     end
 
     def pause_server(server_id)
-      debug "compute-service -> api call usage"
+      debug "compute-service -> pause_server -> POST /servers/#{server_id}/action"
       #handle_response { @fog.pause_server(server_id) }
     end
 
     def unpause_server(server_id)
-      debug "compute-service -> api call usage"
+      debug "compute-service -> unpause_server -> POST /action"
       #handle_response { @fog.unpause_server(server_id) }
     end
 
     def reset_server_state(server_id, state)
-      debug "compute-service -> api call usage"
+      debug "compute-service -> reset_server_state -> POST /servers/#{server_id}/action"
       #handle_response { @fog.reset_server_state(server_id, state) }
     end
 
     def rescue_server(server_id)
-      debug "compute-service -> api call usage"
+      debug "compute-service -> rescue_server -> POST /servers/#{server_id}/action"
       #handle_response { @fog.rescue_server(server_id) }
     end
 
     def resume_server(server_id)
-      debug "compute-service -> api call usage"
+      debug "compute-service -> resume_server -> POST /servers/#{server_id}/action"
       #handle_response { @fog.resume_server(server_id) }
     end
 
     def add_fixed_ip(server_id, network_id)
-      debug "compute-service -> api call usage"
+      debug "compute-service -> add_fixed_ip -> POST /action"
       #handle_response{@fog.add_fixed_ip(server_id, network_id)}
     end
 
     def remove_fixed_ip(server_id, address)
-      debug "compute-service -> api call usage"
+      debug "compute-service -> remove_fixed_ip -> POST /action"
       #handle_response{@fog.remove_fixed_ip(server_id, address)}
     end
 
@@ -303,18 +303,6 @@ module ServiceLayer
 
     def detach_volume(volume_id, server_id)
       driver.detach_volume(server_id, volume_id)
-    end
-
-    def resize_server(server_id,flavor_id)
-      driver.resize_server(server_id, flavor_id)
-    end
-
-    def confirm_resize_server(server_id)
-      driver.confirm_resize_server(server_id)
-    end
-
-    def revert_resize_server(server_id)
-      driver.revert_resize_server(server_id)
     end
 
     ##################### KEYPAIRS #########################
