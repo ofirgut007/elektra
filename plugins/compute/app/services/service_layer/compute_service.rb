@@ -238,8 +238,6 @@ module ServiceLayer
       driver.map_to(Compute::Image).get_image(id) rescue nil
     end
 
-
-
     def new_os_interface(server_id,attributes={})
       os_interface = Compute::OsInterface.new(driver,attributes)
       os_interface.server_id = server_id
@@ -275,6 +273,10 @@ module ServiceLayer
       debug "[compute-service] -> flavors -> GET /flavors/detail"
       response = api_client.compute.list_flavors_with_details(prepare_filter(filter))
       map_to(Compute::Flavor, response.body['flavors'])
+    end
+
+    def security_groups_details(security_group_id)
+      driver.map_to(Networking::SecurityGroup).server_security_groups security_group_id
     end
 
     def flavor_members(flavor_id)

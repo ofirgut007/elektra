@@ -57,7 +57,7 @@ module Compute
     end
 
     def security_groups_details
-      @driver.map_to(Networking::SecurityGroup).server_security_groups self.id
+      @driver.security_groups_details self.id
     end
 
     def availability_zone

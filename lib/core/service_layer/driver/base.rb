@@ -18,7 +18,7 @@ module Core
           elsif response.is_a?(Hash)
             @klass.new(@driver,response.merge(@additional_attributes))
           else
-            nil  
+            nil
           end
         end
 
@@ -68,6 +68,7 @@ module Core
           end
           Mapper.new(self,klass,additional_attributes)
         end
+
       end
     end
   end
