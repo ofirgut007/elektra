@@ -212,20 +212,20 @@ module Compute
       end
 
       ########################### IMAGES #############################
-      def images(filter={})
-        handle_response { @fog.list_images(filter).body['images'] }
-      end
+      #def images(filter={})
+      #  handle_response { @fog.list_images(filter).body['images'] }
+      #end
 
       #def get_image(image_id)
       #  handle_response { @fog.get_image_details(image_id).body['image'] }
       #end
 
-      def delete_image(id)
-        handle_response {
-          @fog.delete_image(id)
-          true
-        }
-      end
+      #def delete_image(id)
+      #  handle_response {
+      #    @fog.delete_image(id)
+      #    true
+      #  }
+      #end
 
       ########################### AVAILABILITY_ZONES #############################
 

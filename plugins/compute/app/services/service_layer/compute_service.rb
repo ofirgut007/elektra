@@ -193,11 +193,13 @@ module ServiceLayer
 
     ########################### FIXED IP ADDRESS ###################
 
+    # NOTE: not used?
     def add_fixed_ip(server_id, network_id)
       debug "[compute-service] -> add_fixed_ip -> POST /action"
       api_client.compute.add_associate_fixed_ip_addfixedip_action(server_id, 'addFixedIp' => {'networkId' => network_id} )
     end
 
+    # NOTE: not used?
     def remove_fixed_ip(server_id, address)
       debug "[compute-service] -> remove_fixed_ip #{address} -> POST /action"
       api_client.compute.remove_disassociate_fixed_ip_removefixedip_action(server_id, 'removeFixedIp' => {'address' => address} )
@@ -206,13 +208,21 @@ module ServiceLayer
     ########################### IMAGES #############################
 
     def create_image(server_id, name, metadata={})
-      debug "[compute-service] -> create_image -> POST /action"
-      #handle_response { @fog.create_image(server_id, name, metadata).body['image'] }
+      debug "[compute-service] -> create_image #{name} -> POST /action"
+      debug "Metadata: #{metadata}"
+
+      api_client.compute.create_image_createimage_action(
+        server_id,
+        'createImage' => {
+          'name'     => name,
+          'metadata' => metadata
+      })
     end
 
     def images
-      debug "[compute-service] -> images"
-      driver.map_to(Compute::Image).images
+      debug "[compute-service] -> images -> GET /images"
+      response = api_client.compute.list_images()
+      map_to(Compute::Image,response.body['images'])
     end
 
     def image(image_id,use_cache = false)
@@ -230,6 +240,12 @@ module ServiceLayer
 
       return nil if image_data.nil?
       Compute::Image.new(self, image_data)
+    end
+
+    # NOTE: not used here?
+    def delete_image(image_id)
+      debug "[compute-service] -> images -> DELETE /images/#{image_id}"
+      api_client.compute.delete_image(image_id)
     end
 
     ########################### VOLUMES #############################
