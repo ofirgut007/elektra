@@ -150,9 +150,9 @@ module Compute
 
       ##################### HOST AGGREGATES #########################
 
-      def host_aggregates(filter = {})
-        handle_response { @fog.list_aggregates(filter).body['aggregates'] }
-      end
+      #def host_aggregates(filter = {})
+      #  handle_response { @fog.list_aggregates(filter).body['aggregates'] }
+      #end
 
       ############################# OS INTERFACES ##############################
       def create_os_interface(server_id,options={})
