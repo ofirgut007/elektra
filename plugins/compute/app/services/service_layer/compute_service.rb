@@ -353,8 +353,9 @@ module ServiceLayer
     ##################### HOST AGGREGATES #########################
 
     def host_aggregates(filter = {})
-      debug "[compute-service] -> host_aggregates"
-      driver.map_to(Compute::HostAggregate).host_aggregates(filter)
+      debug "[compute-service] -> host_aggregates -> GET /os-aggregates"
+      response = api_client.compute.list_aggregates(prepare_filter(filter))
+      map_to(Compute::HostAggregate, response.body['aggregates'])
     end
 
     ############################# OS INTERFACES ##############################
