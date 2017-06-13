@@ -132,11 +132,7 @@ module Compute
       id = self.image["id"]
       return nil if id.blank?
 
-      image = Rails.cache.fetch("server_image_#{id}", expires_in: 24.hours) do
-        @driver.get_image(id) rescue nil
-      end
-      return nil if image.nil?
-      @image_object = Compute::Image.new(self.driver,image)
+      @driver.image(id,true) rescue nil
     end
 
     def metadata

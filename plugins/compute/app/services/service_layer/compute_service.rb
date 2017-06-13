@@ -18,6 +18,8 @@ module ServiceLayer
       not current_user.service_url('compute',region: region).nil?
     end
 
+    ########################### SERVER #############################
+
     def find_server(id)
       debug "[compute-service] -> find_server -> GET /servers/#{id}"
       return nil if id.empty?
@@ -141,11 +143,6 @@ module ServiceLayer
       api_client.compute.revert_resized_server_revertresize_action(server_id, 'revertResize' => nil)
     end
 
-    def create_image(server_id, name, metadata={})
-      debug "[compute-service] -> create_image -> POST /action"
-      #handle_response { @fog.create_image(server_id, name, metadata).body['image'] }
-    end
-
     def start_server(server_id)
       debug "[compute-service] -> start_server -> POST /servers/#{server_id}/action"
       api_client.compute.start_server_os_start_action(server_id, 'os-start' => nil)
@@ -162,16 +159,6 @@ module ServiceLayer
         server_id,
         'reboot' => {'type' => type}
       )
-    end
-
-    def attach_volume(volume_id, server_id, device)
-      debug "[compute-service] -> attach_volume -> POST /action"
-      #handle_response { @fog.attach_volume(volume_id, server_id, device) }
-    end
-
-    def detach_volume(server_id, volume_id)
-      debug "[compute-service] -> detach_volume -> POST /action"
-      #handle_response { @fog.detach_volume(server_id, volume_id) }
     end
 
     def suspend_server(server_id)
@@ -204,6 +191,8 @@ module ServiceLayer
       api_client.compute.resume_suspended_server_resume_action(server_id, 'resume' => nil)
     end
 
+    ########################### FIXED IP ADDRESS ###################
+
     def add_fixed_ip(server_id, network_id)
       debug "[compute-service] -> add_fixed_ip -> POST /action"
       #handle_response{@fog.add_fixed_ip(server_id, network_id)}
@@ -212,6 +201,25 @@ module ServiceLayer
     def remove_fixed_ip(server_id, address)
       debug "[compute-service] -> remove_fixed_ip -> POST /action"
       #handle_response{@fog.remove_fixed_ip(server_id, address)}
+    end
+
+    ########################### IMAGES #############################
+
+    def create_image(server_id, name, metadata={})
+      debug "[compute-service] -> create_image -> POST /action"
+      #handle_response { @fog.create_image(server_id, name, metadata).body['image'] }
+    end
+
+    ########################### VOLUMES #############################
+
+    def attach_volume(volume_id, server_id, device)
+      debug "[compute-service] -> attach_volume -> POST /action"
+      driver.attach_volume(volume_id, server_id, device)
+    end
+
+    def detach_volume(volume_id, server_id)
+      debug "[compute-service] -> detach_volume -> POST /action"
+      driver.detach_volume(server_id, volume_id)
     end
 
     ##################### HYPERVISORS #########################
@@ -251,10 +259,24 @@ module ServiceLayer
       driver.map_to(Compute::Image).images
     end
 
-    def image(id)
-      debug "[compute-service] -> image"
-      driver.map_to(Compute::Image).get_image(id) rescue nil
+    def image(image_id,use_cache = false)
+      debug "[compute-service] -> image -> GET /images/#{image_id}"
+
+      image_data = nil
+      unless use_cache
+        image_data = api_client.compute.show_image_details(image_id).body['image']
+        Rails.cache.write("server_image_#{image_id}", image_data, expires_in: 24.hours)
+      else
+        image_data = Rails.cache.fetch("server_image_#{image_id}", expires_in: 24.hours) do
+          api_client.compute.show_image_details(image_id).body['image']
+        end
+      end
+      
+      return nil if image_data.nil?
+      Compute::Image.new(self, image_data)
     end
+
+    ############################# OS INTERFACES ##############################
 
     def new_os_interface(server_id,attributes={})
       debug "[compute-service] -> new_os_interface"
@@ -267,6 +289,15 @@ module ServiceLayer
       debug "[compute-service] -> server_os_interfaces"
       driver.map_to(Compute::OsInterface).list_os_interfaces(server_id)
     end
+
+    ########################### SECURITY_GROUPS #############################
+
+    def security_groups_details(security_group_id)
+      debug "[compute-service] -> security_groups_details"
+      driver.map_to(Networking::SecurityGroup).server_security_groups security_group_id
+    end
+
+    ########################### FLAVORS #############################
 
     def new_flavor(params={})
       debug "[compute-service] -> new_flavor"
@@ -296,11 +327,6 @@ module ServiceLayer
       map_to(Compute::Flavor, response.body['flavors'])
     end
 
-    def security_groups_details(security_group_id)
-      debug "[compute-service] -> security_groups_details"
-      driver.map_to(Networking::SecurityGroup).server_security_groups security_group_id
-    end
-
     def flavor_members(flavor_id)
       debug "[compute-service] -> flavor_members"
       driver.map_to(Compute::FlavorAccess).list_flavor_members(flavor_id)
@@ -321,22 +347,15 @@ module ServiceLayer
       Compute::FlavorAccess.new(driver,params)
     end
 
+    ########################### AVAILABILITY_ZONES #############################
+
     def availability_zones
       debug "[compute-service] -> availability_zones"
       driver.map_to(Compute::AvailabilityZone).availability_zones
     end
 
-    def attach_volume(volume_id, server_id, device)
-      debug "[compute-service] -> attach_volume"
-      driver.attach_volume(volume_id, server_id, device)
-    end
-
-    def detach_volume(volume_id, server_id)
-      debug "[compute-service] -> detach_volume"
-      driver.detach_volume(server_id, volume_id)
-    end
-
     ##################### KEYPAIRS #########################
+
     def new_keypair(attributes={})
       debug "[compute-service] -> new_keypair"
       Compute::Keypair.new(driver, attributes)
