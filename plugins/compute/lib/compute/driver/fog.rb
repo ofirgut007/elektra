@@ -220,6 +220,7 @@ module Compute
       #  handle_response { @fog.get_image_details(image_id).body['image'] }
       #end
 
+      # not used
       #def delete_image(id)
       #  handle_response {
       #    @fog.delete_image(id)
@@ -266,24 +267,27 @@ module Compute
       end
 
       ########################### VOLUMES #############################
-      def create_volume(params={})
-        handle_response { @fog.create_volume(name, description, size, options).body['volume'] }
-      end
+      # not used
+      #def create_volume(params={})
+      #  handle_response { @fog.create_volume(name, description, size, options).body['volume'] }
+      #end
 
-      def volumes(filter={})
-        handle_response { @fog.list_volumes_detail(filter).body['volumes'] }
-      end
+      #def volumes(filter={})
+      #  handle_response { @fog.list_volumes_detail(filter).body['volumes'] }
+      #end
 
-      def get_volume(id)
-        handle_response { @fog.get_volume_details(id).body['volume'] }
-      end
+      # not used
+      #def get_volume(id)
+      #  handle_response { @fog.get_volume_details(id).body['volume'] }
+      #end
 
-      def delete_volume(id)
-        handle_response {
-          @fog.delete_volume(id)
-          true
-        }
-      end
+      # not used
+      #def delete_volume(id)
+      #  handle_response {
+      #    @fog.delete_volume(id)
+      #    true
+      #  }
+      #end
 
       ##################### KEYPAIRS #########################
       def keypairs(filter={})

@@ -145,9 +145,7 @@ module Compute
 
     def attached_volumes
       unless volumes_attached.empty?
-        @driver.volumes.select{|vol|
-          vol["attachments"].find { |attachment| attachment["serverId"] == id or attachment["server_id"] == id}
-        }.collect{|v| Compute::OsVolume.new(@driver,v)} #map to OsVolume
+        @driver.volumes(id)
       else
         []
       end

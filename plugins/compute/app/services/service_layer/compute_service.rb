@@ -18,6 +18,12 @@ module ServiceLayer
       not current_user.service_url('compute',region: region).nil?
     end
 
+    def usage(filter = {})
+      debug "[compute-service] -> usage -> GET /limits"
+      response = api_client.compute.show_rate_and_absolute_limits(prepare_filter(filter))
+      map_to(Compute::Usage,response.body['limits']['absolute'])
+    end
+
     ########################### SERVER #############################
 
     def find_server(id)
@@ -27,15 +33,6 @@ module ServiceLayer
       map_to(Compute::Server,response.body['server'])
     end
 
-    def vnc_console(server_id,console_type='novnc')
-      debug "[compute-service] -> vnc_console -> POST /action"
-      response = api_client.compute.get_vnc_console_os_getvncconsole_action(
-        server_id,
-        "os-getVNCConsole" => {'type' => console_type }
-      )
-      map_to(Compute::VncConsole,response.body['console'])
-    end
-
     def new_server(params={})
       debug "[compute-service] -> new_server"
       Compute::Server.new(self,params)
@@ -43,7 +40,7 @@ module ServiceLayer
 
     def create_server(params={})
       debug "[compute-service] -> create_server -> POST /servers"
-      debug params
+      debug "Parameter: #{params}"
 
       name       = params.delete("name")
       flavor_ref = params.delete("flavorRef")
@@ -98,10 +95,13 @@ module ServiceLayer
 
     end
 
-    def usage(filter = {})
-      debug "[compute-service] -> usage -> GET /limits"
-      response = api_client.compute.show_rate_and_absolute_limits(prepare_filter(filter))
-      map_to(Compute::Usage,response.body['limits']['absolute'])
+    def vnc_console(server_id,console_type='novnc')
+      debug "[compute-service] -> vnc_console -> POST /action"
+      response = api_client.compute.get_vnc_console_os_getvncconsole_action(
+        server_id,
+        "os-getVNCConsole" => {'type' => console_type }
+      )
+      map_to(Compute::VncConsole,response.body['console'])
     end
 
     def rebuild_server(server_id, image_ref, name, admin_pass=nil, metadata=nil, personality=nil)
@@ -242,7 +242,7 @@ module ServiceLayer
       Compute::Image.new(self, image_data)
     end
 
-    # NOTE: not used here?
+    # NOTE: not used?
     def delete_image(image_id)
       debug "[compute-service] -> images -> DELETE /images/#{image_id}"
       api_client.compute.delete_image(image_id)
@@ -251,13 +251,46 @@ module ServiceLayer
     ########################### VOLUMES #############################
 
     def attach_volume(volume_id, server_id, device)
-      debug "[compute-service] -> attach_volume -> POST /action"
-      driver.attach_volume(volume_id, server_id, device)
+      debug "[compute-service] -> attach_volume #{volume_id} -> POST /action"
+      api_client.compute.attach_a_volume_to_an_instance(
+        server_id,
+        'volumeAttachment' => {
+        'volumeId' => volume_id.to_s,
+        'device'   => device
+      })
     end
 
     def detach_volume(volume_id, server_id)
-      debug "[compute-service] -> detach_volume -> POST /action"
-      driver.detach_volume(server_id, volume_id)
+      debug "[compute-service] -> detach_volume #{volume_id} -> DELETE /action"
+      api_client.compute.detach_a_volume_from_an_instance(server_id,volume_id)
+    end
+
+    def volumes(server_id,filter={})
+      debug "[compute-service] -> volumes -> GET /os-volumes"
+      response = api_client.compute.list_volumes(prepare_filter(filter))
+      response.body['volumes'].select{|vol|
+        vol["attachments"].find { |attachment| attachment["serverId"] == server_id or attachment["server_id"] == server_id}
+      }.collect{|v| map_to(Compute::OsVolume,v)}
+    end
+
+    # NOTE: not used?
+    def get_volume(id)
+      debug "[compute-service] -> get_volume -> GET /os-volumes/#{id}"
+      response = api_client.compute.show_volume_details(id)
+      map_to(Compute::OsVolume,response.body['volume'])
+    end
+
+    # NOTE: not used?
+    def delete_volume(id)
+      debug "[compute-service] -> delete_volume -> DELETE /os-volumes/#{id}"
+      api_client.compute.delete_volume(id)
+    end
+
+    # NOTE: not used?
+    def create_volume(params={})
+      debug "[compute-service] -> create_volume -> POST /os-volumes"
+      debug "Parameter: #{params}"
+      api_client.compute.create_volume(params).body['volume']
     end
 
     ##################### HYPERVISORS #########################
