@@ -34,6 +34,7 @@ module ServiceLayer
     end
 
     def new_server(params={})
+      # this is used for inital create server dialog
       debug "[compute-service] -> new_server"
       Compute::Server.new(self,params)
     end
@@ -92,7 +93,6 @@ module ServiceLayer
       end
 
        map_to(Compute::Server,server_data)
-
     end
 
     def vnc_console(server_id,console_type='novnc')
@@ -208,6 +208,7 @@ module ServiceLayer
     ########################### IMAGES #############################
 
     def create_image(server_id, name, metadata={})
+      # used in create snapshot
       debug "[compute-service] -> create_image #{name} -> POST /action"
       debug "Metadata: #{metadata}"
 
@@ -239,7 +240,7 @@ module ServiceLayer
       end
 
       return nil if image_data.nil?
-      Compute::Image.new(self, image_data)
+      map_to(Compute::Image image_data)
     end
 
     # NOTE: not used?
@@ -296,19 +297,22 @@ module ServiceLayer
     ##################### HYPERVISORS #########################
 
     def hypervisors(filter = {})
-      debug "[compute-service] -> hypervisors"
-      driver.map_to(Compute::Hypervisor).hypervisors(filter)
+      debug "[compute-service] -> hypervisors -> GET /os-hypervisors/detail"
+      response = api_client.compute.list_hypervisors_details(prepare_filter(filter))
+      map_to(Compute::Hypervisor,response.body['hypervisors'])
     end
 
     def find_hypervisor(id)
-      debug "[compute-service] -> find_hypervisor"
+      debug "[compute-service] -> find_hypervisor -> GET /os-hypervisors/#{id}"
       return nil if id.blank?
-      driver.map_to(Compute::Hypervisor).get_hypervisor(id)
+      response = api_client.compute.show_hypervisor_details(id)
+      map_to(Compute::Hypervisor,response.body['hypervisor'])
     end
 
-    def hypervisor_servers(id)
-      debug "[compute-service] -> hypervisor_servers"
-      driver.map_to(Compute::HypervisorServer).hypervisor_servers(id)
+    def hypervisor_servers(hypervisor_hostname_pattern)
+      debug "[compute-service] -> hypervisor_servers -> GET /os-hypervisors/#{hypervisor_hostname_pattern}/servers"
+      response = api_client.compute.list_hypervisor_servers(hypervisor_hostname_pattern)
+      map_to(Compute::HypervisorServer,response.body['hypervisors'].first['servers'])
     end
 
     ##################### SERVICES #########################

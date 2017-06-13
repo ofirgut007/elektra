@@ -117,18 +117,18 @@ module Compute
 
       ############################# HYPERVISORS ##############################
 
-      def hypervisors(filter = {})
-        handle_response { @fog.list_hypervisors_detail(filter).body['hypervisors'] }
-      end
+      #def hypervisors(filter = {})
+      #  handle_response { @fog.list_hypervisors_detail(filter).body['hypervisors'] }
+      #end
 
-      def get_hypervisor(id)
-        handle_response { @fog.get_hypervisor(id).body['hypervisor'] }
-      end
+      #def get_hypervisor(id)
+      #  handle_response { @fog.get_hypervisor(id).body['hypervisor'] }
+      #end
 
-      def hypervisor_servers(name)
-        # FIXME: asking nova with hv name works instead of id? maybe higher microversion will do
-        handle_response { @fog.list_hypervisor_servers(name).body['hypervisors'].first['servers'] }
-      end
+      #def hypervisor_servers(name)
+      #  # FIXME: asking nova with hv name works instead of id? maybe higher microversion will do
+      #  handle_response { @fog.list_hypervisor_servers(name).body['hypervisors'].first['servers'] }
+      #end
 
       ############################# SERVICES ##############################
 
