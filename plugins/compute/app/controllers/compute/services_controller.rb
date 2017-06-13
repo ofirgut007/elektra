@@ -10,13 +10,13 @@ module Compute
 
     def enable
       host = params['id']
-      services.compute.driver.enable_service(host, 'nova-compute')
+      services.compute.enable_service(host, 'nova-compute')
       redirect_to services_url
     end
 
     def disable
       host = params['id']
-      services.compute.driver.disable_service(host, 'nova-compute')
+      services.compute.disable_service(host, 'nova-compute')
       redirect_to services_url
     end
 
@@ -27,7 +27,7 @@ module Compute
     def update
       host = params['id']
       reason = params['service']['reason']
-      if services.compute.driver.disable_service_reason(host, 'nova-compute', reason)
+      if services.compute.disable_service_reason(host, 'nova-compute', reason)
         redirect_to services_url
       else
         render :edit

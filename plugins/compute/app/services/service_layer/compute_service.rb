@@ -10,6 +10,8 @@ module ServiceLayer
       })
     end
 
+    # https://github.com/flystack/misty/blob/master/lib/misty/openstack/nova/nova_v2_1.rb
+
     def prepare_filter(query)
       return Excon::Utils.query_string(query: query).sub(/^\?/, '')
     end
@@ -318,8 +320,34 @@ module ServiceLayer
     ##################### SERVICES #########################
 
     def services(filter = {})
-      debug "[compute-service] -> services"
-      driver.map_to(Compute::Service).services(filter)
+      debug "[compute-service] -> services -> GET /os-services"
+      response = api_client.compute.list_compute_services(prepare_filter(filter))
+      map_to(Compute::Service,response.body['services'])
+    end
+
+    def disable_service_reason(host, name, disabled_reason)
+      debug "[compute-service] -> disable_service_reason -> PUT /os-services/disable-log-reason"
+      api_client.compute.log_disabled_compute_service_information(
+        "host"            => host,
+        "binary"          => name, # I have no idea why that is called binary but name is better
+        "disabled_reason" => disabled_reason
+      )
+    end
+
+    def disable_service(host, name)
+      debug "[compute-service] -> disable_service -> PUT /os-services/disable"
+      api_client.compute.disable_scheduling_for_a_compute_service(
+        "host"   => host,
+        "binary" => name # I have no idea why that is called binary but name is better
+      )
+    end
+
+    def enable_service(host, name)
+      debug "[compute-service] -> enable_service -> PUT /os-services/enable"
+      api_client.compute.enable_scheduling_for_a_compute_service(
+        "host"   => host,
+        "binary" => name # I have no idea why that is called binary but name is better
+      )
     end
 
     ##################### HOST AGGREGATES #########################
