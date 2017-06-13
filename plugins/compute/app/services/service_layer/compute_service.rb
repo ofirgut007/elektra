@@ -195,12 +195,12 @@ module ServiceLayer
 
     def add_fixed_ip(server_id, network_id)
       debug "[compute-service] -> add_fixed_ip -> POST /action"
-      #handle_response{@fog.add_fixed_ip(server_id, network_id)}
+      api_client.compute.add_associate_fixed_ip_addfixedip_action(server_id, 'addFixedIp' => {'networkId' => network_id} )
     end
 
     def remove_fixed_ip(server_id, address)
-      debug "[compute-service] -> remove_fixed_ip -> POST /action"
-      #handle_response{@fog.remove_fixed_ip(server_id, address)}
+      debug "[compute-service] -> remove_fixed_ip #{address} -> POST /action"
+      api_client.compute.remove_disassociate_fixed_ip_removefixedip_action(server_id, 'removeFixedIp' => {'address' => address} )
     end
 
     ########################### IMAGES #############################
@@ -208,6 +208,28 @@ module ServiceLayer
     def create_image(server_id, name, metadata={})
       debug "[compute-service] -> create_image -> POST /action"
       #handle_response { @fog.create_image(server_id, name, metadata).body['image'] }
+    end
+
+    def images
+      debug "[compute-service] -> images"
+      driver.map_to(Compute::Image).images
+    end
+
+    def image(image_id,use_cache = false)
+      debug "[compute-service] -> image -> GET /images/#{image_id}"
+
+      image_data = nil
+      unless use_cache
+        image_data = api_client.compute.show_image_details(image_id).body['image']
+        Rails.cache.write("server_image_#{image_id}", image_data, expires_in: 24.hours)
+      else
+        image_data = Rails.cache.fetch("server_image_#{image_id}", expires_in: 24.hours) do
+          api_client.compute.show_image_details(image_id).body['image']
+        end
+      end
+
+      return nil if image_data.nil?
+      Compute::Image.new(self, image_data)
     end
 
     ########################### VOLUMES #############################
@@ -252,28 +274,6 @@ module ServiceLayer
     def host_aggregates(filter = {})
       debug "[compute-service] -> host_aggregates"
       driver.map_to(Compute::HostAggregate).host_aggregates(filter)
-    end
-
-    def images
-      debug "[compute-service] -> images"
-      driver.map_to(Compute::Image).images
-    end
-
-    def image(image_id,use_cache = false)
-      debug "[compute-service] -> image -> GET /images/#{image_id}"
-
-      image_data = nil
-      unless use_cache
-        image_data = api_client.compute.show_image_details(image_id).body['image']
-        Rails.cache.write("server_image_#{image_id}", image_data, expires_in: 24.hours)
-      else
-        image_data = Rails.cache.fetch("server_image_#{image_id}", expires_in: 24.hours) do
-          api_client.compute.show_image_details(image_id).body['image']
-        end
-      end
-      
-      return nil if image_data.nil?
-      Compute::Image.new(self, image_data)
     end
 
     ############################# OS INTERFACES ##############################
