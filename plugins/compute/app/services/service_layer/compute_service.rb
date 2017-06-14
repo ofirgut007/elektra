@@ -400,9 +400,26 @@ module ServiceLayer
 
     ########################### SECURITY_GROUPS #############################
 
-    def security_groups_details(security_group_id)
-      debug "[compute-service] -> security_groups_details"
-      driver.map_to(Networking::SecurityGroup).server_security_groups security_group_id
+    def security_groups_details(server_id)
+      debug "[compute-service] -> security_groups_details -> GET /servers/#{server_id}/os-security-groups"
+      response = api_client.compute.list_security_groups_by_server(server_id)
+      map_to(Networking::SecurityGroup,response.body['security_groups'])
+    end
+
+    def remove_security_group(server_id, sg_id)
+      debug "[compute-service] -> remove_security_group -> POST /servers/#{server_id}/action"
+      api_client.compute.remove_security_group_from_a_server_removesecuritygroup_action(
+        server_id,
+        'removeSecurityGroup' => {"name" => sg_id}
+      )
+    end
+
+    def add_security_group(server_id, sg_id)
+      debug "[compute-service] -> add_security_group -> POST /servers/#{server_id}/action"
+      api_client.compute.add_security_group_to_a_server_addsecuritygroup_action(
+        server_id,
+        'addSecurityGroup' => {"name" => sg_id}
+      )
     end
 
     ########################### FLAVORS #############################

@@ -235,36 +235,36 @@ module Compute
       #end
 
       ########################### SECURITY_GROUPS #############################
-      def create_security_group(params={})
-        handle_response { @fog.security_groups.create(params) }
-      end
+      #def create_security_group(params={})
+      #  handle_response { @fog.security_groups.create(params) }
+      #end
 
-      def security_groups(filter={})
-        handle_response { @fog.list_security_groups.body['security_groups'] }
-      end
+      #def security_groups(filter={})
+      #  handle_response { @fog.list_security_groups.body['security_groups'] }
+      #end
 
-      def server_security_groups(server_id)
-        handle_response { @fog.list_security_groups(server_id: server_id).body['security_groups'] }
-      end
+      #def server_security_groups(server_id)
+      #  handle_response { @fog.list_security_groups(server_id: server_id).body['security_groups'] }
+      #end
 
-      def get_security_group(id)
-        handle_response { @fog.get_security_group(id).body['security_group'] }
-      end
+      #def get_security_group(id)
+      #  handle_response { @fog.get_security_group(id).body['security_group'] }
+      #end
 
-      def delete_security_group(id)
-        handle_response {
-          @fog.delete_security_group(id)
-          true
-        }
-      end
+      #def delete_security_group(id)
+      #  handle_response {
+      #    @fog.delete_security_group(id)
+      #    true
+      #  }
+      #end
 
-      def add_security_group(id, sg_id)
-        handle_response { @fog.add_security_group(id, sg_id) }
-      end
+      #def add_security_group(id, sg_id)
+      #  handle_response { @fog.add_security_group(id, sg_id) }
+      #end
 
-      def remove_security_group(id, sg_id)
-        handle_response { @fog.remove_security_group(id, sg_id) }
-      end
+      #def remove_security_group(id, sg_id)
+      #  handle_response { @fog.remove_security_group(id, sg_id) }
+      #end
 
       ########################### VOLUMES #############################
       # not used
