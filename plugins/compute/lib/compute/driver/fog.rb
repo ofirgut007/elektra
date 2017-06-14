@@ -230,9 +230,9 @@ module Compute
 
       ########################### AVAILABILITY_ZONES #############################
 
-      def availability_zones(filter={})
-        handle_response { @fog.list_availability_zones(filter).body['availabilityZoneInfo'] }
-      end
+      #def availability_zones(filter={})
+      #  handle_response { @fog.list_availability_zones(filter).body['availabilityZoneInfo'] }
+      #end
 
       ########################### SECURITY_GROUPS #############################
       def create_security_group(params={})

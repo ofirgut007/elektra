@@ -512,8 +512,9 @@ module ServiceLayer
     ########################### AVAILABILITY_ZONES #############################
 
     def availability_zones
-      debug "[compute-service] -> availability_zones"
-      driver.map_to(Compute::AvailabilityZone).availability_zones
+      debug "[compute-service] -> availability_zones -> GET /os-availability-zone"
+      response = api_client.compute.get_availability_zone_information()
+      map_to(Compute::AvailabilityZone,response.body['availabilityZoneInfo'])
     end
 
     ##################### KEYPAIRS #########################
