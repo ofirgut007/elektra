@@ -1,14 +1,5 @@
 module ServiceLayer
   class ComputeService < Core::ServiceLayer::Service
-    def driver
-      @driver ||= Compute::Driver::Fog.new({
-        auth_url:   self.auth_url,
-        region:     self.region,
-        token:      self.token,
-        domain_id:  self.domain_id,
-        project_id: self.project_id
-      })
-    end
 
     # https://github.com/flystack/misty/blob/master/lib/misty/openstack/nova/nova_v2_1.rb
     # https://github.com/fog/fog-openstack/tree/master/lib/fog/compute/openstack/requests
