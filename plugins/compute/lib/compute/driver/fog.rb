@@ -155,17 +155,17 @@ module Compute
       #end
 
       ############################# OS INTERFACES ##############################
-      def create_os_interface(server_id,options={})
-        handle_response{@fog.create_os_interface(server_id,options).body['interfaceAttachment']}
-      end
+      #def create_os_interface(server_id,options={})
+      #  handle_response{@fog.create_os_interface(server_id,options).body['interfaceAttachment']}
+      #end
 
-      def delete_os_interface(server_id,port_id)
-        handle_response{@fog.delete_os_interface(server_id,port_id)}
-      end
+      #def delete_os_interface(server_id,port_id)
+      #  handle_response{@fog.delete_os_interface(server_id,port_id)}
+      #end
 
-      def list_os_interfaces(server_id)
-        handle_response{@fog.list_os_interfaces(server_id).body['interfaceAttachments']}
-      end
+      #def list_os_interfaces(server_id)
+      #  handle_response{@fog.list_os_interfaces(server_id).body['interfaceAttachments']}
+      #end
 
       ########################### FLAVORS #############################
       #def flavors(filter={})
@@ -210,7 +210,7 @@ module Compute
 #      def get_flavor_metadata(flavor_id)
 #        handle_response{@fog.get_flavor_metadata(flavor_id).body['extra_specs']}
 #      end
-  
+
       ########################### IMAGES #############################
       #def images(filter={})
       #  handle_response { @fog.list_images(filter).body['images'] }

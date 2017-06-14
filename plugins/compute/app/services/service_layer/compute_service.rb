@@ -362,14 +362,40 @@ module ServiceLayer
 
     def new_os_interface(server_id,attributes={})
       debug "[compute-service] -> new_os_interface"
-      os_interface = Compute::OsInterface.new(driver,attributes)
+      os_interface = Compute::OsInterface.new(self,attributes)
       os_interface.server_id = server_id
       os_interface
     end
 
+    def create_os_interface(server_id,options={})
+      debug "[compute-service] -> create_os_interface -> POST /servers/#{server_id}/os-interface"
+
+      data = {
+        'interfaceAttachment' => {}
+      }
+      if options[:port_id]
+        data['interfaceAttachment']['port_id'] = options[:port_id]
+      elsif options[:net_id]
+        data['interfaceAttachment']['net_id'] = options[:net_id]
+      end
+
+      if options[:ip_address]
+        data['interfaceAttachment']['fixed_ips'] = {ip_address: options[:ip_address]}
+      end
+
+      api_client.compute.create_interface(server_id,data)
+
+    end
+
+    def delete_os_interface(server_id,port_id)
+      debug "[compute-service] -> delete_os_interface -> DELETE /servers/#{server_id}/os-interface/#{port_id}"
+      api_client.compute.detach_interface(server_id,port_id)
+    end
+
     def server_os_interfaces(server_id)
-      debug "[compute-service] -> server_os_interfaces"
-      driver.map_to(Compute::OsInterface).list_os_interfaces(server_id)
+      debug "[compute-service] -> server_os_interfaces -> GET /servers/#{server_id}/os-interface"
+      response = api_client.compute.list_port_interfaces(server_id)
+      map_to(Compute::OsInterface,response.body['interfaceAttachments'])
     end
 
     ########################### SECURITY_GROUPS #############################
