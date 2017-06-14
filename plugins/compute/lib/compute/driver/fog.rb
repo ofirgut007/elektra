@@ -290,23 +290,23 @@ module Compute
       #end
 
       ##################### KEYPAIRS #########################
-      def keypairs(filter={})
-        handle_response { @fog.list_key_pairs(filter).body['keypairs'] }
-      end
+      #def keypairs(filter={})
+      #  handle_response { @fog.list_key_pairs(filter).body['keypairs'] }
+      #end#
 
-      def get_keypair(name)
-        handle_response { @fog.get_key_pair(name).body['keypair'] }
-      end
+      #def get_keypair(name)
+      #  handle_response { @fog.get_key_pair(name).body['keypair'] }
+      #end
 
-      def create_keypair(params = {})
-        handle_response { @fog.create_key_pair(params['name'], params['public_key']).body['keypair'] }
-      end
+      #def create_keypair(params = {})
+      #  handle_response { @fog.create_key_pair(params['name'], params['public_key']).body['keypair'] }
+      #end
 
-      def delete_keypair(name)
-        handle_response {
-          @fog.delete_key_pair(name)
-        }
-      end
+      #def delete_keypair(name)
+      #  handle_response {
+      #    @fog.delete_key_pair(name)
+      #  }
+      #end
 
     end
   end

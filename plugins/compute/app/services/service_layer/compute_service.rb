@@ -538,29 +538,48 @@ module ServiceLayer
 
     def new_keypair(attributes={})
       debug "[compute-service] -> new_keypair"
-      Compute::Keypair.new(driver, attributes)
+      Compute::Keypair.new(self, attributes)
     end
 
-    def find_keypair(name=nil)
-      debug "[compute-service] -> find_keypair"
-      return nil if name.blank?
-      driver.map_to(Compute::Keypair).get_keypair(name)
+    def create_keypair(params = {})
+
+      debug "[compute-service] -> create_keypair -> POST /os-keypairs"
+      debug "[compute-service] -> create_keypair -> Parameter #{params}"
+
+      data = {
+        'keypair' => {
+          'name' => params['name']
+        }
+      }
+
+      data['keypair']['public_key'] = params['public_key'] unless params['public_key'].nil?
+
+      api_client.compute.create_or_import_keypair(data).body['keypair']
+
     end
 
-    def delete_keypair(name=nil)
-      debug "[compute-service] -> delete_keypair"
-      return nil if name.blank?
-      driver.map_to(Compute::Keypair).delete_keypair(name)
+    def find_keypair(keypair_name=nil)
+      debug "[compute-service] -> find_keypair -> GET /os-keypairs/#{keypair_name}"
+      return nil if keypair_name.blank?
+      response = api_client.compute.show_keypair_details(keypair_name)
+      map_to(Compute::Keypair, response.body['keypair'])
     end
 
-    def keypairs(options={})
-      debug "[compute-service] -> keypairs"
+    def delete_keypair(keypair_name=nil)
+      debug "[compute-service] -> delete_keypair -> DELETE /os-keypairs/#{keypair_name} "
+      return nil if keypair_name.blank?
+      api_client.compute.delete_keypair(keypair_name)
+    end
+
+    def keypairs()
+      debug "[compute-service] -> keypairs -> GET /list_keypairs"
       # keypair structure different to others, so manual effort needed
       unless @user_keypairs
         @user_keypairs = []
-        keypairs = driver.map_to(Compute::Keypair).keypairs(user_id: @current_user.id)
+        response = api_client.compute.list_keypairs()
+        keypairs = map_to(Compute::Keypair, response.body['keypairs'])
         keypairs.each do |k|
-          kp = Compute::Keypair.new(@driver)
+          kp = Compute::Keypair.new(self)
           kp.attributes = k.keypair if k.keypair
           @user_keypairs << kp if kp
         end
