@@ -25,7 +25,7 @@ module Compute
     
     def remove(key)
       begin
-        @driver.delete_flavor_matadata(self.flavor_id, key)
+        @driver.delete_flavor_metadata(self.flavor_id, key)
         return true
       rescue => e
         raise e unless defined?(@driver.handle_api_errors?) and @driver.handle_api_errors?

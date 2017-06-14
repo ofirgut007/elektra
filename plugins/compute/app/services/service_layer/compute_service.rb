@@ -11,6 +11,7 @@ module ServiceLayer
     end
 
     # https://github.com/flystack/misty/blob/master/lib/misty/openstack/nova/nova_v2_1.rb
+    # https://github.com/fog/fog-openstack/tree/master/lib/fog/compute/openstack/requests
 
     def prepare_filter(query)
       return Excon::Utils.query_string(query: query).sub(/^\?/, '')
@@ -43,7 +44,7 @@ module ServiceLayer
 
     def create_server(params={})
       debug "[compute-service] -> create_server -> POST /servers"
-      debug "Parameter: #{params}"
+      debug "[compute-service] -> create_server -> Parameter: #{params}"
 
       name       = params.delete("name")
       flavor_ref = params.delete("flavorRef")
@@ -59,7 +60,7 @@ module ServiceLayer
       params["min_count"]=params["min_count"].to_i if params["min_count"]
       if networks=params.delete("networks")
        nics=networks.collect { |n| {'net_id' => n["id"], 'v4_fixed_ip' => n['fixed_ip'], 'port_id' => n['port']} }
-       # based on https://github.com/fog/fog-openstack/blob/master/lib/fog/compute/openstack/requests/create_server.rb
+
        if nics
         params['server']['networks'] =
           Array(nics).map do |nic|
@@ -110,7 +111,6 @@ module ServiceLayer
       debug "[compute-service] -> rebuild_server -> POST /action"
 
       # prepare data
-      # based on https://github.com/fog/fog-openstack/blob/master/lib/fog/compute/openstack/requests/rebuild_server.rb
       data = {'rebuild' => {
         'imageRef' => image_ref,
         'name'     => name
@@ -292,7 +292,7 @@ module ServiceLayer
     # NOTE: not used?
     def create_volume(params={})
       debug "[compute-service] -> create_volume -> POST /os-volumes"
-      debug "Parameter: #{params}"
+      debug "[compute-service] -> create_volume -> Parameter: #{params}"
       api_client.compute.create_volume(params).body['volume']
     end
 
@@ -382,8 +382,33 @@ module ServiceLayer
     ########################### FLAVORS #############################
 
     def new_flavor(params={})
+      # this is used for inital create flavor dialog
       debug "[compute-service] -> new_flavor"
-      Compute::Flavor.new(driver,params)
+      Compute::Flavor.new(self,params)
+    end
+
+    def create_flavor(attributes)
+      debug "[compute-service] -> create_flavor -> POST /flavors"
+      debug "[compute-service] -> create_flavor -> Parameter: #{attributes}"
+
+      api_client.compute.create_flavor(
+        'flavor' => {
+                      'name'                       => attributes[:name],
+                      'ram'                        => attributes[:ram],
+                      'vcpus'                      => attributes[:vcpus],
+                      'disk'                       => attributes[:disk],
+                      'id'                         => attributes[:flavor_id],
+                      'swap'                       => attributes[:swap],
+                      'OS-FLV-EXT-DATA:ephemeral'  => attributes[:ephemeral],
+                      'os-flavor-access:is_public' => attributes[:is_public],
+                      'rxtx_factor'                => attributes[:rxtx_factor]
+        }
+      ).body['flavor']
+    end
+
+    def delete_flavor(id)
+      debug "[compute-service] -> delete_flavor -> DELETE /flavors/#{id}"
+      api_client.compute.delete_flavor(id)
     end
 
     def flavor(flavor_id,use_cache = false)
@@ -400,7 +425,7 @@ module ServiceLayer
       end
 
       return nil if flavor_data.nil?
-      Compute::Flavor.new(self,flavor_data)
+      map_to(Compute::Flavor,flavor_data)
     end
 
     def flavors(filter={})
@@ -409,24 +434,53 @@ module ServiceLayer
       map_to(Compute::Flavor, response.body['flavors'])
     end
 
+    def add_flavor_access_to_tenant(flavor_id,tenant_id)
+      debug "[compute-service] -> add_flavor_access_to_tenant -> POST /flavors/#{flavor_id}/action"
+      api_client.compute.add_flavor_access_to_tenant_addtenantaccess_action(
+        flavor_id,
+        "addTenantAccess" => { "tenant" => tenant_id}
+      )
+    end
+
+    def remove_flavor_access_from_tenant(flavor_id,tenant_id)
+      debug "[compute-service] -> remove_flavor_access_from_tenant -> POST /flavors/#{flavor_id}/action"
+       api_client.compute.remove_flavor_access_from_tenant_removetenantaccess_action(
+        flavor_id,
+        "removeTenantAccess" => { "tenant" => tenant_id.to_s }
+      )
+    end
+
+    def create_flavor_metadata(flavor_id,flavor_extras)
+      debug "[compute-service] -> create_flavor_metadata -> POST /flavors/#{flavor_id}/os-extra_specs"
+      response = api_client.compute.create_extra_specs_for_a_flavor(flavor_id, 'extra_specs' => flavor_extras)
+      map_to(Compute::FlavorMetadata,response.body['extra_specs'])
+    end
+
+    def delete_flavor_metadata(flavor_id,key)
+      debug "[compute-service] -> delete_flavor_metadata -> DELETE /flavors/#{flavor_id}/os-extra_specs/#{key}"
+      api_client.compute.delete_an_extra_spec_for_a_flavor(flavor_id, key)
+    end
+
     def flavor_members(flavor_id)
-      debug "[compute-service] -> flavor_members"
-      driver.map_to(Compute::FlavorAccess).list_flavor_members(flavor_id)
+      debug "[compute-service] -> flavor_members -> GET /flavors/#{flavor_id}/os-flavor-access"
+      response = api_client.compute.list_flavor_access_information_for_given_flavor(flavor_id)
+      map_to(Compute::FlavorAccess,response.body['flavor_access'])
     end
 
     def flavor_metadata(flavor_id)
-      debug "[compute-service] -> flavor_metadata"
-      driver.map_to(Compute::FlavorMetadata).get_flavor_metadata(flavor_id)
+      debug "[compute-service] -> flavor_metadata -> GET /flavors/#{flavor_id}/os-extra_specs"
+      response = api_client.compute.list_extra_specs_for_a_flavor(flavor_id)
+      map_to(Compute::FlavorMetadata,response.body['extra_specs'])
     end
 
     def new_flavor_metadata(flavor_id)
       debug "[compute-service] -> new_flavor_metadata"
-      Compute::FlavorMetadata.new(driver, flavor_id: flavor_id)
+      Compute::FlavorMetadata.new(self, flavor_id: flavor_id)
     end
 
     def new_flavor_access(params={})
       debug "[compute-service] -> new_flavor_access"
-      Compute::FlavorAccess.new(driver,params)
+      Compute::FlavorAccess.new(self,params)
     end
 
     ########################### AVAILABILITY_ZONES #############################
