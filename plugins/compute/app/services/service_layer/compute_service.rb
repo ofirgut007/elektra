@@ -40,8 +40,8 @@ module ServiceLayer
       name       = params.delete("name")
       flavor_ref = params.delete("flavorRef")
       params["server"] = {
-              'flavorRef' => flavor_ref,
-              'name'      => name
+        'flavorRef' => flavor_ref,
+        'name'      => name
       }
 
       image_ref = params.delete("imageRef")
@@ -64,7 +64,9 @@ module ServiceLayer
        end
       end
 
-      api_client.compute.create_server(params).body['server']
+      response = api_client.compute.create_server(params)
+      response.body['server']
+
     end
 
     def delete_server(server_id)
@@ -201,14 +203,18 @@ module ServiceLayer
     def create_image(server_id, name, metadata={})
       # used in create snapshot
       debug "[compute-service] -> create_image #{name} -> POST /action"
-      debug "Metadata: #{metadata}"
+      debug "[compute-service] -> create_image -> Metadata: #{metadata}"
 
-      api_client.compute.create_image_createimage_action(
-        server_id,
+      data = {
         'createImage' => {
-          'name'     => name,
-          'metadata' => metadata
-      })
+            'name'     => name,
+            'metadata' => metadata
+        }
+      }
+
+      response = api_client.compute.create_image_createimage_action(server_id,data)
+      response.body['image']
+
     end
 
     def images
@@ -323,30 +329,32 @@ module ServiceLayer
 
     ############################# OS INTERFACES ##############################
 
-    def new_os_interface(server_id,attributes={})
+    def new_os_interface(server_id,params = {})
       debug "[compute-service] -> new_os_interface"
-      os_interface = Compute::OsInterface.new(self,attributes)
+      os_interface = Compute::OsInterface.new(self,params)
       os_interface.server_id = server_id
       os_interface
     end
 
-    def create_os_interface(server_id,options={})
+    def create_os_interface(server_id,params = {})
       debug "[compute-service] -> create_os_interface -> POST /servers/#{server_id}/os-interface"
+      debug "[compute-service] -> create_os_interface -> Parameter: #{params}"
 
       data = {
         'interfaceAttachment' => {}
       }
-      if options[:port_id]
-        data['interfaceAttachment']['port_id'] = options[:port_id]
-      elsif options[:net_id]
-        data['interfaceAttachment']['net_id'] = options[:net_id]
+      if params[:port_id]
+        data['interfaceAttachment']['port_id'] = params[:port_id]
+      elsif params[:net_id]
+        data['interfaceAttachment']['net_id'] = params[:net_id]
       end
 
-      if options[:ip_address]
-        data['interfaceAttachment']['fixed_ips'] = {ip_address: options[:ip_address]}
+      if params[:ip_address]
+        data['interfaceAttachment']['fixed_ips'] = {ip_address: params[:ip_address]}
       end
 
-      api_client.compute.create_interface(server_id,data)
+      response = api_client.compute.create_interface(server_id,data)
+      response.body['interfaceAttachment']
 
     end
 
@@ -387,29 +395,33 @@ module ServiceLayer
 
     ########################### FLAVORS #############################
 
-    def new_flavor(params={})
+    def new_flavor(params = {})
       # this is used for inital create flavor dialog
       debug "[compute-service] -> new_flavor"
       Compute::Flavor.new(self,params)
     end
 
-    def create_flavor(attributes)
+    def create_flavor(params)
       debug "[compute-service] -> create_flavor -> POST /flavors"
-      debug "[compute-service] -> create_flavor -> Parameter: #{attributes}"
+      debug "[compute-service] -> create_flavor -> Parameter: #{params}"
 
-      api_client.compute.create_flavor(
+      data =  {
         'flavor' => {
-                      'name'                       => attributes[:name],
-                      'ram'                        => attributes[:ram],
-                      'vcpus'                      => attributes[:vcpus],
-                      'disk'                       => attributes[:disk],
-                      'id'                         => attributes[:flavor_id],
-                      'swap'                       => attributes[:swap],
-                      'OS-FLV-EXT-DATA:ephemeral'  => attributes[:ephemeral],
-                      'os-flavor-access:is_public' => attributes[:is_public],
-                      'rxtx_factor'                => attributes[:rxtx_factor]
+        'name'                       => params[:name],
+        'ram'                        => params[:ram],
+        'vcpus'                      => params[:vcpus],
+        'disk'                       => params[:disk],
+        'id'                         => params[:flavor_id],
+        'swap'                       => params[:swap],
+        'OS-FLV-EXT-DATA:ephemeral'  => params[:ephemeral],
+        'os-flavor-access:is_public' => params[:is_public],
+        'rxtx_factor'                => params[:rxtx_factor]
         }
-      ).body['flavor']
+      }
+
+      response = api_client.compute.create_flavor(data)
+      response.body['flavor']
+
     end
 
     def delete_flavor(id)
@@ -458,6 +470,8 @@ module ServiceLayer
 
     def create_flavor_metadata(flavor_id,flavor_extras)
       debug "[compute-service] -> create_flavor_metadata -> POST /flavors/#{flavor_id}/os-extra_specs"
+      debug "[compute-service] -> create_flavor_metadata -> Metadata: #{flavor_extras}"
+
       response = api_client.compute.create_extra_specs_for_a_flavor(flavor_id, 'extra_specs' => flavor_extras)
       map_to(Compute::FlavorMetadata,response.body['extra_specs'])
     end
@@ -484,7 +498,7 @@ module ServiceLayer
       Compute::FlavorMetadata.new(self, flavor_id: flavor_id)
     end
 
-    def new_flavor_access(params={})
+    def new_flavor_access(params = {})
       debug "[compute-service] -> new_flavor_access"
       Compute::FlavorAccess.new(self,params)
     end
@@ -499,15 +513,16 @@ module ServiceLayer
 
     ##################### KEYPAIRS #########################
 
-    def new_keypair(attributes={})
+    def new_keypair(params = {})
+      # this is used for inital create keypair dialog
       debug "[compute-service] -> new_keypair"
-      Compute::Keypair.new(self, attributes)
+      Compute::Keypair.new(self,params)
     end
 
     def create_keypair(params = {})
 
       debug "[compute-service] -> create_keypair -> POST /os-keypairs"
-      debug "[compute-service] -> create_keypair -> Parameter #{params}"
+      debug "[compute-service] -> create_keypair -> Parameter: #{params}"
 
       data = {
         'keypair' => {
@@ -517,7 +532,8 @@ module ServiceLayer
 
       data['keypair']['public_key'] = params['public_key'] unless params['public_key'].nil?
 
-      api_client.compute.create_or_import_keypair(data).body['keypair']
+      response = api_client.compute.create_or_import_keypair(data)
+      response.body['keypair']
 
     end
 
