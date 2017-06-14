@@ -186,13 +186,11 @@ module ServiceLayer
 
     ########################### FIXED IP ADDRESS ###################
 
-    # NOTE: not used?
     def add_fixed_ip(server_id, network_id)
       debug "[compute-service] -> add_fixed_ip -> POST /action"
       api_client.compute.add_associate_fixed_ip_addfixedip_action(server_id, 'addFixedIp' => {'networkId' => network_id} )
     end
 
-    # NOTE: not used?
     def remove_fixed_ip(server_id, address)
       debug "[compute-service] -> remove_fixed_ip #{address} -> POST /action"
       api_client.compute.remove_disassociate_fixed_ip_removefixedip_action(server_id, 'removeFixedIp' => {'address' => address} )
@@ -236,12 +234,6 @@ module ServiceLayer
       map_to(Compute::Image image_data)
     end
 
-    # NOTE: not used?
-    def delete_image(image_id)
-      debug "[compute-service] -> images -> DELETE /images/#{image_id}"
-      api_client.compute.delete_image(image_id)
-    end
-
     ########################### VOLUMES #############################
 
     def attach_volume(volume_id, server_id, device)
@@ -265,26 +257,6 @@ module ServiceLayer
       response.body['volumes'].select{|vol|
         vol["attachments"].find { |attachment| attachment["serverId"] == server_id or attachment["server_id"] == server_id}
       }.collect{|v| map_to(Compute::OsVolume,v)}
-    end
-
-    # NOTE: not used?
-    def get_volume(id)
-      debug "[compute-service] -> get_volume -> GET /os-volumes/#{id}"
-      response = api_client.compute.show_volume_details(id)
-      map_to(Compute::OsVolume,response.body['volume'])
-    end
-
-    # NOTE: not used?
-    def delete_volume(id)
-      debug "[compute-service] -> delete_volume -> DELETE /os-volumes/#{id}"
-      api_client.compute.delete_volume(id)
-    end
-
-    # NOTE: not used?
-    def create_volume(params={})
-      debug "[compute-service] -> create_volume -> POST /os-volumes"
-      debug "[compute-service] -> create_volume -> Parameter: #{params}"
-      api_client.compute.create_volume(params).body['volume']
     end
 
     ##################### HYPERVISORS #########################
@@ -577,8 +549,5 @@ module ServiceLayer
       end
       return @user_keypairs
     end
-
-
-
   end
 end
