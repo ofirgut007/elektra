@@ -3,7 +3,6 @@ module Identity
     # Compute calls
     class Fog < Interface
       include Core::ServiceLayer::FogDriver::ClientHelper
-      include Core::ServiceLayer::MistyDriver::ClientHelper # for usage of Limes
 
       def initialize(params_or_driver, options={})
         # support initialization by given driver

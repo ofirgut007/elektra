@@ -1,3 +1,2 @@
-require_relative 'driver/interface'
-require_relative 'driver/misty'
-
+# use misty with our limes-resources extension
+require 'misty/openstack/limes'
