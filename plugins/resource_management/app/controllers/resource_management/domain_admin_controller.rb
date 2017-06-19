@@ -68,22 +68,12 @@ module ResourceManagement
         return
       end
 
-      #puts "XXXX"
-      #puts @project_resource.name
-
       # set quota
       @project_resource.quota = new_quota
       unless @project_resource.save
         render text: @project_resource.errors.full_messages.to_sentence, status: :bad_request
         return
       end
-
-      # TODO: workaround, because after @project_resource.save the @project_resource is brocken so I need to load it again
-      load_project_resource
-      #puts "YYYYY"
-      #puts @project_resource.name
-      #pp @project_resource.quota
-      #puts @project_resource.project_name
 
       # make sure that row is not rendered with red background color
       @project_resource.backend_quota = nil

@@ -4,10 +4,6 @@ module ServiceLayer
     # https://github.com/flystack/misty/blob/master/lib/misty/openstack/nova/nova_v2_1.rb
     # https://github.com/fog/fog-openstack/tree/master/lib/fog/compute/openstack/requests
 
-    def prepare_filter(query)
-      return Excon::Utils.query_string(query: query).sub(/^\?/, '')
-    end
-
     def available?(action_name_sym=nil)
       not current_user.service_url('compute',region: region).nil?
     end
@@ -34,7 +30,7 @@ module ServiceLayer
     end
 
     def create_server(params={})
-      debug "[compute-service] -> create_server -> POST /servers"
+      debug "[compute-service] -> create_server -> POST /serers"
       debug "[compute-service] -> create_server -> Parameter: #{params}"
 
       name       = params.delete("name")
@@ -565,5 +561,12 @@ module ServiceLayer
       end
       return @user_keypairs
     end
+    
+    private
+    
+    def prepare_filter(query)
+      return Excon::Utils.query_string(query: query).sub(/^\?/, '')
+    end
+    
   end
 end
