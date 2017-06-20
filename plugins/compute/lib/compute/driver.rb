@@ -1,1 +1,1 @@
-# no more needed RIP! :-)
+# no more needed but cannot be deleted, because of backward compatiblity

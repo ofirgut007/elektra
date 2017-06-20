@@ -92,28 +92,6 @@ module ResourceManagement
       return self.valid? && perform_update
     end
 
-    # moved to plugins/resource_management/app/services/service_layer/resource_management_service.rb
-    #def perform_update
-    #  services = [{
-    #    type: service_type,
-    #    resources: [{
-    #      name:     name,
-    #      quota:    read(:quota),
-    #      capacity: read(:capacity),
-    #      comment:  read(:comment),
-    #    }.reject { |_,v| v.nil? }],
-    #  }]
-    #  if project_id and project_domain_id
-    #    self.resource_management.put_project_data(project_domain_id, project_id, services)
-    #  elsif domain_id
-    #    self.resource_management.put_domain_data(domain_id, services)
-    #  elsif cluster_id
-    #    self.resource_management.put_cluster_data(services)
-    #  else
-    #    raise ArgumentError, "found nowhere to put quota: #{attributes.inspect}"
-    #  end
-    #end
-
     def clone
       return self.class.new(@driver, attributes.clone)
     end
