@@ -137,6 +137,11 @@ module Networking
         handle_response{@fog.create_floating_ip(network_id, params).body['floatingip']}
       end
 
+      def update_floating_ip(id, params)
+        port_id = params.delete(:port_id)
+        handle_response { @fog.update_floating_ip(id, port_id, params).body['floatingip'] }
+      end
+
       def delete_floating_ip(floating_ip_id)
         handle_response{@fog.delete_floating_ip(floating_ip_id)}
       end

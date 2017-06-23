@@ -41,13 +41,34 @@ module Networking
     def create
       @floating_networks = services.networking.networks('router:external' => true)
       @floating_ip = services.networking.new_floating_ip(params[:floating_ip])
-      @floating_ip.tenant_id=@scoped_project_id
+      @floating_ip.tenant_id = @scoped_project_id
 
       if @floating_ip.save
-        audit_logger.info(current_user, "has created", @floating_ip)
+        audit_logger.info(current_user, 'has created', @floating_ip)
         render action: :create
       else
         render action: :new
+      end
+    end
+
+    def edit
+      @floating_ip = services.networking.find_floating_ip(params[:id])
+    end
+
+    def update
+      @floating_ip = services.networking.find_floating_ip(params[:id])
+      # save existing port_id, blame neutron API for needing that on no-op
+      port_id = @floating_ip.attributes['port_id']
+      @floating_ip.attributes = params[:floating_ip]
+      @floating_ip.port_id = port_id
+
+      if @floating_ip.save
+        respond_to do |format|
+          format.html { redirect_to floating_ips_url }
+          format.js { render 'update.js' }
+        end
+      else
+        render action: :edit
       end
     end
 
