@@ -6,14 +6,6 @@ GIT
     elektra-extension (0.0.1)
 
 GIT
-  remote: https://github.com/flystack/misty.git
-  revision: 1217d0213e705b122a95772738ce7c28771496a2
-  branch: master
-  specs:
-    misty (0.6.0)
-      json (>= 1.8.3, < 3)
-
-GIT
   remote: https://github.com/sapcc/arc-client.git
   revision: 5d9b922d3c19d02f0cd87c7cc93f80802a960b50
   specs:
@@ -63,6 +55,12 @@ GIT
       hashie
       rails
       uglifier (>= 1.3.0)
+
+PATH
+  remote: /root/workspace/monsoon/misty-cc
+  specs:
+    misty (0.6.1)
+      json (>= 1.8.3, < 3)
 
 PATH
   remote: plugins/automation
@@ -454,6 +452,7 @@ GEM
       railties (>= 3.2)
       tilt
     redcarpet (3.3.4)
+    request_store (1.3.2)
     responders (2.1.0)
       railties (>= 4.2.0, < 5)
     rest-client (2.0.0)
@@ -601,6 +600,7 @@ DEPENDENCIES
   rails_stdout_logging
   react-rails
   redcarpet
+  request_store
   resource_management!
   responders
   rspec
@@ -620,4 +620,4 @@ DEPENDENCIES
   web-console (~> 2.0)
 
 BUNDLED WITH
-   1.15.0
+   1.15.1

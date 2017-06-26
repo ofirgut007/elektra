@@ -65,7 +65,8 @@ gem 'arc-client', git: 'https://github.com/sapcc/arc-client.git'
 
 # Limes
 #gem 'misty', git: 'https://github.com/sapcc/misty.git', branch: :master
-gem 'misty', git: 'https://github.com/flystack/misty.git', branch: :master
+#gem 'misty', git: 'https://github.com/flystack/misty.git', branch: :master
+gem 'misty', :path => '/root/workspace/monsoon/misty-cc'
 gem 'misty-limes', git: 'https://github.com/sapcc/misty-limes.git'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -75,6 +76,9 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'puma', require: false
 ###################### PLUGINS #####################
+
+# garbage control for global thread data
+gem 'request_store'
 
 # backlist plugins (global)
 black_list = ['webconsole'] #e.g. ['compute', 'cost_control']
