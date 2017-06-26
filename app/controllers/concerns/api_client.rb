@@ -10,7 +10,7 @@ module APIClient
     puts "[api-client] -> api_client" if ENV['SERVICE_LAYER_DEBUG']
     return nil unless current_user.service_url('identity', {region: current_region, interface: 'public'})
 
-    RequestStore.store[:api_client] ||= ::Misty::Cloud.new(
+    RequestStore.store[:user_api_client] ||= ::Misty::Cloud.new(
       auth:            misty_auth_params,
       region_id:       current_region,
       ssl_verify_mode: Rails.configuration.ssl_verify_peer
