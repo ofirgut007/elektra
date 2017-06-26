@@ -47,6 +47,14 @@ GIT
     misty-limes (0.2.2)
 
 GIT
+  remote: https://github.com/sapcc/misty.git
+  revision: 667ee2387037eefd3b1e04a822c1078d433c3b72
+  branch: use_existing_context
+  specs:
+    misty (0.6.1)
+      json (>= 1.8.3, < 3)
+
+GIT
   remote: https://github.com/sapcc/monsoon-openstack-auth.git
   revision: f51523238c89f524b1b7eb0dcfeee97e278b4420
   specs:
@@ -55,12 +63,6 @@ GIT
       hashie
       rails
       uglifier (>= 1.3.0)
-
-PATH
-  remote: /root/workspace/monsoon/misty-cc
-  specs:
-    misty (0.6.1)
-      json (>= 1.8.3, < 3)
 
 PATH
   remote: plugins/automation
