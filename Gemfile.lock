@@ -6,6 +6,14 @@ GIT
     elektra-extension (0.0.1)
 
 GIT
+  remote: https://github.com/flystack/misty.git
+  revision: 8e6da9c0d7000949c0ebe9a28de11f278a07fc80
+  branch: master
+  specs:
+    misty (0.6.1)
+      json (>= 1.8.3, < 3)
+
+GIT
   remote: https://github.com/sapcc/arc-client.git
   revision: 5d9b922d3c19d02f0cd87c7cc93f80802a960b50
   specs:
@@ -45,14 +53,6 @@ GIT
   revision: a99a86bf87c659cb4e5e968417623283ff70865a
   specs:
     misty-limes (0.2.2)
-
-GIT
-  remote: https://github.com/sapcc/misty.git
-  revision: 667ee2387037eefd3b1e04a822c1078d433c3b72
-  branch: use_existing_context
-  specs:
-    misty (0.6.1)
-      json (>= 1.8.3, < 3)
 
 GIT
   remote: https://github.com/sapcc/monsoon-openstack-auth.git

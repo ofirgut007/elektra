@@ -64,8 +64,8 @@ gem 'arc-client', git: 'https://github.com/sapcc/arc-client.git'
 # gem 'therubyracer', platforms: :ruby
 
 # Limes
-gem 'misty', git: 'https://github.com/sapcc/misty.git', branch: :use_existing_context
-#gem 'misty', git: 'https://github.com/flystack/misty.git', branch: :master
+#gem 'misty', git: 'https://github.com/sapcc/misty.git', branch: :use_existing_context
+gem 'misty', git: 'https://github.com/flystack/misty.git', branch: :master
 #gem 'misty', :path => '/root/workspace/monsoon/misty-cc'
 gem 'misty-limes', git: 'https://github.com/sapcc/misty-limes.git'
 

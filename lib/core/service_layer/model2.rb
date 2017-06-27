@@ -18,7 +18,6 @@ module Core
         self.attributes=params
         # get just the name of class without namespaces
         @class_name = self.class.name.split('::').last.underscore
-        puts "init #{@class_name}"
 
         # create errors object
         @errors = ActiveModel::Errors.new(self)
