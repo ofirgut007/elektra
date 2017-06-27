@@ -1,7 +1,7 @@
 require "base64"
 
 module Compute
-  class ServerNG < Core::ServiceLayer::ModelNG
+  class ServerNG < Core::ModelNG
     validates :name, presence: {message: 'Please provide a name'}
     validates :image_id, presence: {message: 'Please select an image'}
     validates :flavor_id, presence: {message: 'Please select a flavor'}
