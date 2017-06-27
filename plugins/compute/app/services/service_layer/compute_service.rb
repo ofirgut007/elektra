@@ -14,11 +14,6 @@ module ServiceLayer
       not current_user.service_url('compute',region: region).nil?
     end
 
-    def find_server(id)
-      return nil if id.blank?
-      driver.map_to(Compute::Server).get_server(id)
-    end
-
     def new_server(params={})
       Compute::Server.new(driver,params)
     end

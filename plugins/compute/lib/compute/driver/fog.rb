@@ -22,10 +22,6 @@ module Compute
         handle_response { @fog.create_server(name, image_ref, flavor_ref, params).body['server'] }
       end
 
-      def get_server(server_id)
-        handle_response { @fog.get_server_details(server_id).body['server'] }
-      end
-
       def delete_server(server_id)
         handle_response { @fog.delete_server(server_id) }
       end

@@ -46,7 +46,7 @@ module Compute
     end
 
     def show
-      @instance = services.compute.find_server(params[:id])
+      @instance = ServerNG.find(params[:id])
       @instance_security_groups = @instance.security_groups_details.collect do |sg|
         services.networking.security_groups(tenant_id: @scoped_project_id, id: sg.id).first
       end
@@ -94,7 +94,7 @@ module Compute
 
     # update instance table row (ajax call)
     def update_item
-      @instance = services.compute.find_server(params[:id]) rescue nil
+      @instance = ServerNG.find(params[:id]) rescue nil
       @target_state = params[:target_state]
 
       respond_to do |format|
@@ -114,7 +114,7 @@ module Compute
       if @instance.save
         flash.now[:notice] = "Instance successfully created."
         audit_logger.info(current_user, "has created", @instance)
-        @instance = services.compute.find_server(@instance.id)
+        @instance = ServerNG.find(@instance.id)
         render template: 'compute/instances/create.js'
       else
         @flavors = services.compute.flavors
@@ -129,7 +129,7 @@ module Compute
 
     def new_floatingip
       enforce_permissions("::networking:floating_ip_associate")
-      @instance = services.compute.find_server(params[:id])
+      @instance = ServerNG.find(params[:id])
       collect_available_ips
 
       @floating_ip = Networking::FloatingIp.new(nil)
@@ -162,7 +162,7 @@ module Compute
         respond_to do |format|
           format.html{redirect_to instances_url}
           format.js{
-            @instance = services.compute.find_server(params[:id])
+            @instance = ServerNG.find(params[:id])
             addresses = @instance.addresses[@instance.addresses.keys.first]
             addresses ||= []
             addresses << {
@@ -194,7 +194,7 @@ module Compute
         }
         format.js{
           if @floating_ip and @floating_ip.port_id.nil?
-            @instance = services.compute.find_server(params[:id])
+            @instance = ServerNG.find(params[:id])
             addresses = @instance.addresses[@instance.addresses.keys.first]
             if addresses and addresses.is_a?(Array)
               addresses.delete_if{|values| values["OS-EXT-IPS:type"]=="floating"}
@@ -213,7 +213,7 @@ module Compute
     def create_interface
       @os_interface = services.compute.new_os_interface(params[:id],params[:os_interface])
       if @os_interface.save
-        @instance = services.compute.find_server(params[:id])
+        @instance = ServerNG.find(params[:id])
         respond_to do |format|
           format.html{redirect_to instances_url}
           format.js{}
@@ -225,7 +225,7 @@ module Compute
     end
 
     def detach_interface
-      @instance = services.compute.find_server(params[:id])
+      @instance = ServerNG.find(params[:id])
       @os_interface = services.compute.new_os_interface(params[:id])
     end
 
@@ -256,7 +256,7 @@ module Compute
         timeout = 60
         sleep_time = 3
         loop do
-          @instance = services.compute.find_server(params[:id])
+          @instance = ServerNG.find(params[:id])
           if timeout<=0 or @instance.addresses.values.flatten.length==all_server_interfaces.length-1
             break
           else
@@ -269,14 +269,14 @@ module Compute
           format.js{}
         end
       else
-        @instance = services.compute.find_server(params[:id])
+        @instance = ServerNG.find(params[:id])
         @os_interface.ip_address=params[:os_interface][:ip_address]
         render action: :detach_interface
       end
     end
 
     def new_size
-      @instance = services.compute.find_server(params[:id])
+      @instance = ServerNG.find(params[:id])
       @flavors  = services.compute.flavors
     end
 
@@ -358,7 +358,7 @@ module Compute
     end
 
     def edit_securitygroups
-      @instance = services.compute.find_server(params[:id])
+      @instance = ServerNG.find(params[:id])
       @instance_security_groups = @instance.security_groups_details
       @instance_security_groups_keys = []
       @instance_security_groups.each do |sg|
@@ -368,7 +368,7 @@ module Compute
     end
 
     def assign_securitygroups
-      @instance = services.compute.find_server(params[:id])
+      @instance = ServerNG.find(params[:id])
       @instance_security_groups = @instance.security_groups_details
       @instance_security_groups_ids = []
       @instance_security_groups.each do |sg|
@@ -381,7 +381,7 @@ module Compute
       sgs = params['sgs']
       if sgs.blank?
         flash.now[:error] = "Please assign at least one security group to the server"
-        @instance = services.compute.find_server(params[:id])
+        @instance = ServerNG.find(params[:id])
         @instance_security_groups = @instance.security_groups_details
         @instance_security_groups_keys = []
         @instance_security_groups.each do |sg|
@@ -411,7 +411,7 @@ module Compute
           end
 
         rescue => e
-          @instance = services.compute.find_server(params[:id])
+          @instance = ServerNG.find(params[:id])
           @instance_security_groups = @instance.security_groups_details
           @instance_security_groups_keys = []
           @instance_security_groups.each do |sg|
@@ -457,7 +457,7 @@ module Compute
 
     def execute_instance_action(action=action_name,options=nil, with_rendering=true)
       instance_id = params[:id]
-      @instance = services.compute.find_server(instance_id) rescue nil
+      @instance = ServerNG.find(instance_id) rescue nil
 
       @target_state=nil
       if @instance and (@instance.task_state || '')!='deleting'
@@ -465,7 +465,7 @@ module Compute
         if result
           audit_logger.info(current_user, "has triggered action", action, "on", @instance)
           sleep(2)
-          @instance = services.compute.find_server(instance_id) rescue nil
+          @instance = ServerNG.find(instance_id) rescue nil
 
           @target_state = target_state_for_action(action)
           @instance.task_state ||= task_state(@target_state) if @instance

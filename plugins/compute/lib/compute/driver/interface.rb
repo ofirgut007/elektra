@@ -8,10 +8,6 @@ module Compute
         raise ServiceLayer::Errors::NotImplemented
       end
 
-      def get_server(server_id)
-        raise ServiceLayer::Errors::NotImplemented
-      end
-
       def delete_server(server_id)
         raise ServiceLayer::Errors::NotImplemented
       end
