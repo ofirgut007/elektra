@@ -14,7 +14,6 @@ module BlockStorage
 
     # GET /volumes
     def index
-      #@servers = services.compute.servers
       @servers = get_cached_servers
       @action_id = params[:id]
       if @scoped_project_id
@@ -114,7 +113,7 @@ module BlockStorage
     def edit_attach
       @volume_server = VolumeServer.new
       @volume_server.volume = @volume
-      @volume_server.servers = services.compute.servers.keep_if do |s|
+      @volume_server.servers = ServerNG.all.keep_if do |s|
         SERVER_STATES_NEEDED_FOR_ATTACH.include?(s.status) and
         s.availability_zone==@volume.availability_zone
       end
@@ -133,17 +132,17 @@ module BlockStorage
             audit_logger.info(current_user, "has attached", @volume, "to", @volume_server.server['server_id'])
             render template: 'block_storage/volumes/update_item_with_close.js'
           else
-            @volume_server.servers = services.compute.servers
+            @volume_server.servers = ServerNG.all
             @volume_server.errors[:base] << "Volume attachment failed!"
             render :edit_attach and return
           end
         rescue Exception => e
-          @volume_server.servers = services.compute.servers
+          @volume_server.servers = ServerNG.all
           @volume_server.errors[:base] << "Volume attachment failed! #{e.message}"
           render :edit_attach and return
         end
       else
-        @volume_server.servers = services.compute.servers
+        @volume_server.servers = ServerNG.all
         render :edit_attach and return
       end
     end
@@ -234,7 +233,7 @@ module BlockStorage
 
     def get_cached_servers
       Rails.cache.fetch("#{@scoped_project_id}_servers", expires_in: 2.hours) do
-        services.compute.servers
+        ServerNG.all
       end
     end
 

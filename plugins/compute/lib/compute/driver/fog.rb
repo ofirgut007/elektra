@@ -9,10 +9,6 @@ module Compute
         @fog = ::Fog::Compute::OpenStack.new(auth_params)
       end
 
-      def servers(filter={})
-        handle_response { @fog.list_servers_detail(filter).body['servers'] }
-      end
-
       def create_server(params={})
         name = params.delete("name")
         image_ref = params.delete("imageRef")

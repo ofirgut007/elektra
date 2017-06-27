@@ -27,11 +27,6 @@ module ServiceLayer
       Compute::Server.new(driver,params)
     end
 
-    def servers(filter={})
-      return [] unless current_user.is_allowed?('compute:instance_list')
-      driver.map_to(Compute::Server).servers(filter)
-    end
-
     def usage(filter = {})
       driver.map_to(Compute::Usage).usage(filter)
     end

@@ -35,7 +35,7 @@ module Automation
 
     def install
       begin
-        @compute_instances = services.compute.servers
+        @compute_instances = ServerNG.all
       rescue => exception
         logger.error exception.message
         @compute_instances = []

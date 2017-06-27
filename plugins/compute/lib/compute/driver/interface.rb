@@ -4,10 +4,6 @@ module Compute
     class Interface < Core::ServiceLayer::Driver::Base
 
       ########################### SERVERS ##############################  
-      def servers(filter={})
-        raise ServiceLayer::Errors::NotImplemented
-      end
-
       def create_server(params={})
         raise ServiceLayer::Errors::NotImplemented
       end
