@@ -294,11 +294,11 @@ module Compute
 
       server_data = nil
       unless use_cache
-        server_data = api_client.compute.list_servers_detailed(prepare_filter(filter)).body['servers']
+        server_data = api.compute.list_servers_detailed(filter).body['servers']
         Rails.cache.write("#{@scoped_project_id}_servers",server_data, expires_in: 2.hours)
       else
         server_data = Rails.cache.fetch("#{@scoped_project_id}_servers", expires_in: 2.hours) do
-          api_client.compute.list_servers_detailed(prepare_filter(filter)).body['servers']
+          api.compute.list_servers_detailed(filter).body['servers']
         end
       end
 
