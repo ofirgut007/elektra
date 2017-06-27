@@ -52,6 +52,10 @@ Rails.application.configure do
     puts "=> Trusted IP #{ENV['TRUSTED_IP']}"
   end
 
+  if ENV['MODEL_DEBUG']
+    puts "=> Debug model #{ENV['MODEL_DEBUG']}"
+  end
+
   if ENV['SERVICE_LAYER_DEBUG']
     puts "=> Debug servicelayer #{ENV['SERVICE_LAYER_DEBUG']}"
   end

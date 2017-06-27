@@ -16,12 +16,12 @@ module ServiceLayer
 
     ########################### SERVER #############################
 
-    def find_server(id)
-      debug "[compute-service] -> find_server -> GET /servers/#{id}"
-      return nil if id.empty?
-      response = api_client.compute.show_server_details(id)
-      map_to(Compute::Server,response.body['server'])
-    end
+#    def find_server(id)
+#      debug "[compute-service] -> find_server -> GET /servers/#{id}"
+#      return nil if id.empty?
+#      response = api_client.compute.show_server_details(id)
+#      map_to(Compute::Server,response.body['server'])
+#    end
 
     def new_server(params={})
       # this is used for inital create server dialog
@@ -65,36 +65,32 @@ module ServiceLayer
 
     end
 
-    def delete_server(server_id)
-      debug "[compute-service] -> delete_server -> DELETE /servers/#{server_id}"
-      api_client.compute.delete_server(server_id)
-    end
+#    def servers(filter={},use_cache = false)
+#      puts "[Server] -> servers -> GET servers/detail"
+#      #return [] unless current_user.is_allowed?('compute:instance_list')
+#
+#      server_data = nil
+#      unless use_cache
+#        server_data = RequestStore.store[:user_api_client].compute.list_servers_detailed(prepare_filter(filter)).body['servers']
+#        Rails.cache.write("#{@scoped_project_id}_servers",server_data, expires_in: 2.hours)
+#      else
+#        server_data = Rails.cache.fetch("#{@scoped_project_id}_servers", expires_in: 2.hours) do
+#          RequestStore.store[:user_api_client].compute.list_servers_detailed(prepare_filter(filter)).body['servers']
+#        end
+#      end
+#
+#      map_to(Compute::Server,server_data)
+#    end
 
-    def servers(filter={},use_cache = false)
-      debug "[compute-service] -> servers -> GET servers/detail"
-      return [] unless current_user.is_allowed?('compute:instance_list')
 
-      server_data = nil
-      unless use_cache
-        server_data = api_client.compute.list_servers_detailed(prepare_filter(filter)).body['servers']
-        Rails.cache.write("#{@scoped_project_id}_servers",server_data, expires_in: 2.hours)
-      else
-        server_data = Rails.cache.fetch("#{@scoped_project_id}_servers", expires_in: 2.hours) do
-          api_client.compute.list_servers_detailed(prepare_filter(filter)).body['servers']
-        end
-      end
-
-       map_to(Compute::Server,server_data)
-    end
-
-    def vnc_console(server_id,console_type='novnc')
-      debug "[compute-service] -> vnc_console -> POST /action"
-      response = api_client.compute.get_vnc_console_os_getvncconsole_action(
-        server_id,
-        "os-getVNCConsole" => {'type' => console_type }
-      )
-      map_to(Compute::VncConsole,response.body['console'])
-    end
+#    def vnc_console(server_id,console_type='novnc')
+#      debug "[compute-service] -> vnc_console -> POST /action"
+#      response = api_client.compute.get_vnc_console_os_getvncconsole_action(
+#        server_id,
+#        "os-getVNCConsole" => {'type' => console_type }
+#      )
+#      map_to(Compute::VncConsole,response.body['console'])
+#    end
 
     def rebuild_server(server_id, image_ref, name, admin_pass=nil, metadata=nil, personality=nil)
       debug "[compute-service] -> rebuild_server -> POST /action"

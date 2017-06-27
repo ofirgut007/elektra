@@ -24,7 +24,7 @@ module Core
 
         def method_missing(method_sym, *arguments, &block)
           puts "[driver] -> mapper -> method_missing" if ENV['DRIVER_LAYER_DEBUG']
-          if arguments.count>0
+          if arguments.count > 0
             map(@driver.send(method_sym, *arguments, &block))
           else
             map(@driver.send(method_sym,&block))

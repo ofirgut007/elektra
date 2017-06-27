@@ -19,12 +19,6 @@ module APIClient
 
   def misty_auth_params
     
-    #auth = ::Misty::AuthV3.new( context: { 
-    #  catalog: current_user.context["catalog"],
-    #  expires: current_user.context["expires_at"],
-    #  token: current_user.token
-    #})
-    
     # https://github.com/sapcc/monsoon-openstack-auth#user-class-current_user
     return {
       context: { 
