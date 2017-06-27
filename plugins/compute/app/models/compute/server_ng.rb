@@ -280,11 +280,10 @@ module Compute
 
     def vnc_console(console_type='novnc')
       debug "[Server] #{id} -> vnc_console -> POST /action"
-      response = api_client.compute.get_vnc_console_os_getvncconsole_action(
+      api.compute.get_vnc_console_os_getvncconsole_action(
         id,
         "os-getVNCConsole" => {'type' => console_type }
-      )
-      map_to(Compute::VncConsoleNG,response.body['console'])
+      ).map_to(Compute::VncConsoleNG)
     end
 
     # static function
@@ -308,8 +307,7 @@ module Compute
     def self.find(id)
       debug "[Server] -> find -> GET /servers/#{id}"
       return nil if id.empty?
-      response = api_client.compute.show_server_details(id)
-      map_to(Compute::ServerNG,response.body['server'])
+      api.compute.show_server_details(id).map_to(Compute::ServerNG)
     end
 
   end

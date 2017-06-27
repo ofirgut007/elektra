@@ -37,8 +37,8 @@ module Compute
     end
 
     def console
-      @instance = services.compute.find_server(params[:id])
-      @console = services.compute.vnc_console(params[:id])
+      @instance = ServerNG.find(params[:id])
+      @console = @instance.vnc_console
       respond_to do |format|
         format.html{ render action: :console, layout: 'compute/console'}
         format.json{ render json: { url: @console.url }}
