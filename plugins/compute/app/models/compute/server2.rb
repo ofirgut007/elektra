@@ -270,7 +270,7 @@ module Compute
     end
 
     def vnc_console(console_type='novnc')
-      self.class.debug "[Server] -> vnc_console -> POST /action"
+      self.class.debug "[Server] #{id} -> vnc_console -> POST /action"
       response = RequestStore.store[:user_api_client].compute.get_vnc_console_os_getvncconsole_action(
         id,
         "os-getVNCConsole" => {'type' => console_type }
@@ -279,7 +279,7 @@ module Compute
     end
 
     # static function
-    def self.servers(filter={},use_cache = false)
+    def self.all(filter={},use_cache = false)
       debug "[Server] -> servers -> GET servers/detail"
       #return [] unless current_user.is_allowed?('compute:instance_list')
 
@@ -296,7 +296,7 @@ module Compute
       map_to(Compute::Server2,server_data)
     end
 
-    def self.find_server(id)
+    def self.find(id)
       debug "[Server] -> find_server -> GET /servers/#{id}"
       return nil if id.empty?
       response = RequestStore.store[:user_api_client].compute.show_server_details(id)

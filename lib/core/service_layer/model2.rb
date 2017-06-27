@@ -227,6 +227,10 @@ module Core
         return nil
       end
 
+      def map_to(*args)
+        self.class.map_to(*args)
+      end
+
       def self.map_to(klazz,data,additional_attributes={})
         if data.is_a?(Array)
           data.collect{|item| klazz.new(item.merge(additional_attributes))}

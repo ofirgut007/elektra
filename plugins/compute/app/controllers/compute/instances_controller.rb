@@ -11,9 +11,8 @@ module Compute
       @instances = []
       
         if @scoped_project_id
-        # TODO: return [] unless current_user.is_allowed?('compute:instance_list')
         @instances = paginatable(per_page: (params[:per_page] || 20)) do |pagination_options|
-          Server2.servers(@admin_option.merge(pagination_options))
+          Server2.all(@admin_option.merge(pagination_options))
         end
 
         # get/calculate quota data for non-admin view
@@ -39,7 +38,7 @@ module Compute
     end
 
     def console
-      @instance = Server2.find_server(params[:id])
+      @instance = Server2.find(params[:id])
       @console = @instance.vnc_console
       respond_to do |format|
         format.html{ render action: :console, layout: 'compute/console'}
