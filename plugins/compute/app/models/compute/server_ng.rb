@@ -289,6 +289,7 @@ module Compute
     # static function
     def self.all(filter={},use_cache = false)
       debug "[Server] -> all -> GET servers/detail"
+      #return [] unless current_user.is_allowed?('compute:instance_list')
 
       server_data = nil
       unless use_cache
@@ -300,7 +301,7 @@ module Compute
         end
       end
 
-      api.map_to(Compute::ServerNG,server_data)
+      map_to(Compute::ServerNG,server_data)
     end
 
     def self.find(id)
