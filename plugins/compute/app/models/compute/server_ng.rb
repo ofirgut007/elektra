@@ -199,7 +199,7 @@ module Compute
 
     def revert_resize
       requires :id
-      @driver.revert_resize_server(id)
+      api.revert_resize_server(id)
       true
     end
 
@@ -210,36 +210,45 @@ module Compute
     end
 
     def reboot(type = 'SOFT')
+      debug "[Server] -> reboot -> POST /servers/#{id}/action"
       requires :id
-      @driver.reboot_server(id, type)
+      api.compute.reboot_server_reboot_action(
+        id,
+        'reboot' => {'type' => type}
+      )
       true
     end
 
     def stop
+      debug "[Server] -> stop -> POST /servers/#{id}/action"
       requires :id
-      @driver.stop_server(id)
+      api.compute.stop_server_os_stop_action(id, 'os-stop' => nil)
     end
 
     def pause
+      debug "[Server] -> pause -> POST /servers/#{id}/action"
       requires :id
-      @driver.pause_server(id)
+      api.compute.stop_server_os_stop_action(id, 'os-stop' => nil)
     end
 
     def suspend
+      debug "[Server] -> suspend -> POST /servers/#{id}/action"
       requires :id
       @driver.suspend_server(id)
     end
 
     def start
       requires :id
-
       case status.downcase
       when 'paused'
-        @driver.unpause_server(id)
+        debug "[Server] -> paused -> POST /servers/#{id}/action"
+        api.compute.unpause_server_unpause_action(id, 'unpause' => nil)
       when 'suspended'
-        @driver.resume_server(id)
+        debug "[Server] -> suspended -> POST /servers/#{id}/action"
+        api.compute.rescue_server_rescue_action(id, 'rescue' => nil)
       else
-        @driver.start_server(id)
+        debug "[Server] -> start -> POST /servers/#{id}/action"
+        api.compute.start_server_os_start_action(id, 'os-start' => nil)
       end
     end
 
