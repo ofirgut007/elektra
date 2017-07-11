@@ -3,7 +3,6 @@ module ServiceLayerNg
   # This class implements the identity api
   class ComputeService < Core::ServiceLayerNg::Service
     
-    include Snapshot
     include Flavor
     include HostAggregate
     include Hypervisor
@@ -12,11 +11,12 @@ module ServiceLayerNg
     include SecurityGroup
     include Server
     include Service
+    include Snapshot
     include Volume
  
-    def available?(action_name_sym=nil)
+    def available?(_action_name_sym = nil)
       debug "[compute-service] -> available?"
-      not current_user.service_url('compute',region: region).nil?
+      api.catalog_include_service?('compute', region)
     end
 
     def usage(filter = {})
