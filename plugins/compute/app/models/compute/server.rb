@@ -235,11 +235,6 @@ module Compute
       end
     end
 
-    def create_image(name, metadata={})
-      requires :id
-      @service.create_image(id, name, metadata)
-    end
-
     def reset_vm_state(vm_state)
       requires :id
       @service.reset_server_state id, vm_state
