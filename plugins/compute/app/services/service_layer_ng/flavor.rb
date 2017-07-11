@@ -5,6 +5,7 @@ module ServiceLayerNg
     def new_flavor(params = {})
       # this is used for inital create flavor dialog
       debug "[compute-service][Flavor] -> new_flavor"
+      debug "[compute-service][Flavor] -> new_flavor -> Parameter: #{params}"
       Compute::Flavor.new(self,params)
     end
 

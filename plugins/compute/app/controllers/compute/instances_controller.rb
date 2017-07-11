@@ -209,7 +209,10 @@ module Compute
     end
 
     def create_interface
+      # create new os_interface
       @os_interface = services_ng.compute.new_os_interface(params[:id],params[:os_interface])
+      # and bind it to the related server (given by server_id)
+      # take a look to Os:Interface Model
       if @os_interface.save
         @instance = services_ng.compute.find_server(params[:id])
         respond_to do |format|

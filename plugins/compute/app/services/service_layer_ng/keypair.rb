@@ -20,10 +20,11 @@ module ServiceLayerNg
     def new_keypair(params = {})
       # this is used for inital create keypair dialog
       debug "[compute-service][Keypair] -> new_keypair"
+      debug "[compute-service][Keypair] -> new_keypair -> Parameter: #{params}"
       Compute::Keypair.new(self,params)
     end
 
-    def create_keypair(params = {})
+    def create_keypair(params)
 
       debug "[compute-service][Keypair] -> create_keypair -> POST /os-keypairs"
       debug "[compute-service][Keypair] -> create_keypair -> Parameter: #{params}"
@@ -36,7 +37,8 @@ module ServiceLayerNg
 
       data['keypair']['public_key'] = params['public_key'] unless params['public_key'].nil?
 
-      api.compute.create_or_import_keypair(data).data
+      response = api.compute.create_interface(server_id,data)
+      response.body['interfaceAttachment']
 
     end
 

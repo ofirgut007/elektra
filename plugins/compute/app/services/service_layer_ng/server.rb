@@ -5,6 +5,7 @@ module ServiceLayerNg
     def new_server(params={})
       # this is used for inital create server dialog
       debug "[compute-service][Server] -> new_server"
+      debug "[compute-service][Server] -> new_server -> Parameter: #{params}"
       Compute::Server.new(self,params)
     end
 
@@ -24,7 +25,7 @@ module ServiceLayerNg
       map_to(Compute::Server,server_data)
     end
 
-    def create_server(params={})
+    def create_server(params)
       debug "[compute-service][Server] -> create_server -> POST /servers"
       debug "[compute-service][Server] -> create_server -> Parameter: #{params}"
 

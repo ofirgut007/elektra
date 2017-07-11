@@ -15,6 +15,7 @@ module ServiceLayerNg
     include Volume
     
     def available?(action_name_sym=nil)
+      debug "[compute-service] -> available?"
       not current_user.service_url('compute',region: region).nil?
     end
 

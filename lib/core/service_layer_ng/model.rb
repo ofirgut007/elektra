@@ -221,7 +221,7 @@ module Core
         end
       end
 
-      # msp to service create method
+      # map to service create method
       def perform_service_create(create_attributes)
         @service.send("create_#{@class_name}", create_attributes)
       end
