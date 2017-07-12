@@ -1,5 +1,5 @@
 module ResourceManagement
-  class NewStyleService < Core::ServiceLayer::Model
+  class NewStyleService < Core::ServiceLayerNg::Model
 
     def type
       read(:type).to_sym
