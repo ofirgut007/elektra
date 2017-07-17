@@ -42,7 +42,7 @@ module ResourceManagement
           resources: srv.resources.map { |res| { name: res.name, quota: res.quota } },
         }
       end
-      @driver.put_project_data(domain_id, id, data)
+      @service.put_project_data(domain_id, id, data)
     end
 
     private
