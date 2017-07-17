@@ -2,17 +2,16 @@ module ServiceLayerNg
   # This module implements Openstack Group API
   module DomainResource
 
-    def find_domain(domain_id, options={})
+    def find_domain(domain_id, query={})
       debug "[resource management-service][DomainResource] -> find_domain -> GET /v1/domains/#{domain_id}"
-      debug "[resource management-service][DomainResource] -> find_domain -> Options: #{options}"
+      debug "[resource management-service][DomainResource] -> find_domain -> Query: #{query}"
 
-      response = api_client.resources.get_domain(domain_id,query)
-      map_to(ResourceManagement::Domain,response.body[domain_id.nil? ? 'domains' : 'domain'])
+      api.resources.get_domain(domain_id,query).map_to(ResourceManagement::Domain)
     end
 
-    def list_domains(options={})
+    def list_domains(query={})
       debug "[resource management-service][DomainResource] -> list_domains -> GET /v1/domains/#{domain_id}"
-      debug "[resource management-service][DomainResource] -> list_domains -> Options: #{options}"
+      debug "[resource management-service][DomainResource] -> list_domains -> Query: #{query}"
 
       api.resources.get_domains(query).map_to(ResourceManagement::Domain)
     end

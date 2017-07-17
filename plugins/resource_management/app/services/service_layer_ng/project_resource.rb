@@ -2,11 +2,11 @@ module ServiceLayerNg
   # This module implements Openstack Group API
   module ProjectResource
     
-    def find_project(domain_id, project_id, options={})
+    def find_project(domain_id, project_id, query={})
       debug "[resource management-service][ProjectResource] -> find_project -> GET /v1/domains/#{domain_id}/projects/#{project_id}"
-      debug "[resource management-service][ProjectResource] -> find_project -> Options: #{options}"
+      debug "[resource management-service][ProjectResource] -> find_project -> Query: #{query}"
       
-      api.resources.get_project(domain_id, project_id, options).map_to(ResourceManagement::Project)
+      api.resources.get_project(domain_id, project_id, query).map_to(ResourceManagement::Project)
     end
 
     def has_project_quotas?(domain_id,project_id,project_domain_id)
@@ -24,9 +24,9 @@ module ServiceLayerNg
       return project.resources.any? { |r| r.quota > 0 }
     end
 
-    def list_projects(domain_id, options={})
+    def list_projects(domain_id, query={})
       debug "[resource management-service][ProjectResource] -> list_projects -> GET /v1/domains/#{domain_id}"
-      debug "[resource management-service][ProjectResource] -> list_projects -> Options: #{options}"
+      debug "[resource management-service][ProjectResource] -> list_projects -> Query: #{query}"
 
       api.resources.get_projects(domain_id, query).map_to(ResourceManagement::Project)
     end
