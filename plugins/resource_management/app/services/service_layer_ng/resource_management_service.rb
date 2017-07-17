@@ -2,8 +2,8 @@ module ServiceLayerNg
 
   class ResourceManagementService < Core::ServiceLayerNg::Service
 
-    include ProjectResource
-    include DomainResource
+    include ResourceManagementService::ProjectResource
+    include ResourceManagementService::DomainResource
 
   end
 end

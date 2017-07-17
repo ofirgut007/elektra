@@ -1,6 +1,6 @@
 module ServiceLayerNg
   # This module implements Openstack Group API
-  module ProjectResource
+  module ResourceManagementService::ProjectResource
     
     def find_project(domain_id, project_id, query={})
       debug "[resource management-service][ProjectResource] -> find_project -> GET /v1/domains/#{domain_id}/projects/#{project_id}"
