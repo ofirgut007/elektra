@@ -6,6 +6,10 @@ module ServiceLayerNg
     include ResourceManagementService::DomainResource
     include ResourceManagementService::CloudResource
 
+    def available?(_action_name_sym = nil)
+      api.catalog_include_service?('resources', region)
+    end
+
     def quota_data(domain_id,project_id,options=[])
       debug "[resource management-service] -> quota_data"
       return [] if options.empty?
