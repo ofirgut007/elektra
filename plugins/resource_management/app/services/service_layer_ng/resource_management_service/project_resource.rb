@@ -5,7 +5,7 @@ module ServiceLayerNg
     def find_project(domain_id, project_id, query={})
       debug "[resource management-service][ProjectResource] -> find_project -> GET /v1/domains/#{domain_id}/projects/#{project_id}"
       debug "[resource management-service][ProjectResource] -> find_project -> Query: #{query}"
-      
+      # give the domain_id to enrich the Project object with domain_id
       api.resources.get_project(domain_id, project_id, query).map_to(ResourceManagement::Project,domain_id: domain_id)
     end
 
@@ -27,7 +27,7 @@ module ServiceLayerNg
     def list_projects(domain_id, query={})
       debug "[resource management-service][ProjectResource] -> list_projects -> GET /v1/domains/#{domain_id}"
       debug "[resource management-service][ProjectResource] -> list_projects -> Query: #{query}"
-
+      # give the domain_id to enrich the Project object with domain_id
       api.resources.get_projects(domain_id, query).map_to(ResourceManagement::Project,domain_id: domain_id)
     end
 
