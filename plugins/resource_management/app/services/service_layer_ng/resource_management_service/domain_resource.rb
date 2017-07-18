@@ -10,7 +10,7 @@ module ServiceLayerNg
     end
 
     def list_domains(query={})
-      debug "[resource management-service][DomainResource] -> list_domains -> GET /v1/domains/#{domain_id}"
+      debug "[resource management-service][DomainResource] -> list_domains -> GET /v1/domains/#{query}"
       debug "[resource management-service][DomainResource] -> list_domains -> Query: #{query}"
 
       api.resources.get_domains(query).map_to(ResourceManagement::Domain)

@@ -4,6 +4,7 @@ module ServiceLayerNg
 
     include ResourceManagementService::ProjectResource
     include ResourceManagementService::DomainResource
+    include ResourceManagementService::CloudResource
 
     def quota_data(domain_id,project_id,options=[])
       debug "[resource management-service] -> quota_data"
