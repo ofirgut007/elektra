@@ -6,7 +6,7 @@ module ResourceManagement
         cluster_id: id,
       }
 
-      @services ||= read(:services).map { |data| ResourceManagement::NewStyleService.new(@services, data.merge(metadata)) }
+      @services ||= read(:services).map { |data| ResourceManagement::NewStyleService.new(@service, data.merge(metadata)) }
     end
 
     def resources
@@ -30,7 +30,7 @@ module ResourceManagement
           resources: srv.resources.map { |res| { name: res.name, capacity: res.capacity, comment: res.comment || '' } },
         }
       end
-      @services.put_cluster_data(id, data)
+      @service.put_cluster_data(id, data)
     end
 
   end
