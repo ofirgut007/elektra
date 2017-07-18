@@ -101,6 +101,7 @@ module ResourceManagement
           comment:  read(:comment),
         }.reject { |_,v| v.nil? }],
       }]
+
       if project_id and project_domain_id
         @service.put_project_data(project_domain_id, project_id, services)
       elsif domain_id

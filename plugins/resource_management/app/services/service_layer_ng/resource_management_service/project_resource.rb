@@ -6,7 +6,7 @@ module ServiceLayerNg
       debug "[resource management-service][ProjectResource] -> find_project -> GET /v1/domains/#{domain_id}/projects/#{project_id}"
       debug "[resource management-service][ProjectResource] -> find_project -> Query: #{query}"
       
-      api.resources.get_project(domain_id, project_id, query).map_to(ResourceManagement::Project)
+      api.resources.get_project(domain_id, project_id, query).map_to(ResourceManagement::Project,domain_id: domain_id)
     end
 
     def has_project_quotas?(domain_id,project_id,project_domain_id)
@@ -28,12 +28,17 @@ module ServiceLayerNg
       debug "[resource management-service][ProjectResource] -> list_projects -> GET /v1/domains/#{domain_id}"
       debug "[resource management-service][ProjectResource] -> list_projects -> Query: #{query}"
 
-      api.resources.get_projects(domain_id, query).map_to(ResourceManagement::Project)
+      api.resources.get_projects(domain_id, query).map_to(ResourceManagement::Project,domain_id: domain_id)
     end
 
     def sync_project_asynchronously(domain_id, project_id)
       debug "[resource management-service][ProjectResource] -> sync_project_asynchronously -> POST /v1/domains/#{domain_id}/projects/#{project_id}/sync"
       api_client.resources.sync_project(domain_id, project_id)
+    end
+
+    def put_project_data(domain_id, project_id, services)
+      debug "[resource management-service][ProjectResource] -> put_project_data -> PUT /v1/domains/#{domain_id}/projects/#{project_id}"
+      api.resources.set_quota_for_project(domain_id,project_id, :project => {:services => services})
     end
     
   end
