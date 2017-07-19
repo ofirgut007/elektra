@@ -15,7 +15,7 @@ module ResourceManagement
       region = [Rails.application.config.default_region].flatten.first
       result = []
 
-      services_ng.resource_management.list_domains(services: ['none']).each do |domain|
+      services_ng.resource_management.list_domains(service: ['none']).each do |domain|
         services_ng.resource_management.list_projects(domain.id).each do |project|
           project.services.each do |srv|
             srv.resources.each do |res|

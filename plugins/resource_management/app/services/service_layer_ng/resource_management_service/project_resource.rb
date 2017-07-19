@@ -14,8 +14,8 @@ module ServiceLayerNg
       project = find_project(
         domain_id || project_domain_id,
         project_id,
-        services:  [ 'compute',                   'network',  'object-store' ],
-        resources: [ 'instances', 'ram', 'cores', 'networks', 'capacity'     ],
+        service:  [ 'compute',                   'network',  'object-store' ],
+        resource: [ 'instances', 'ram', 'cores', 'networks', 'capacity'     ],
       )
       # return true if approved_quota of the resource networking:networks is greater than 0
       # OR

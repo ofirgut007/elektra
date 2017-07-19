@@ -30,7 +30,7 @@ module ResourceManagement
       @area_services = ResourceManagement::ServiceConfig.in_area(@area)
       raise ActiveRecord::RecordNotFound, "unknown area #{@area}" if @area_services.empty?
 
-      @domain = services_ng.resource_management.find_domain(@scoped_domain_id, services: @area_services.map(&:catalog_type))
+      @domain = services_ng.resource_management.find_domain(@scoped_domain_id, service: @area_services.map(&:catalog_type))
       @resources = @domain.resources
       @min_updated_at = @domain.services.map(&:min_updated_at).min
       @max_updated_at = @domain.services.map(&:max_updated_at).max
@@ -294,9 +294,9 @@ module ResourceManagement
         c.name == resource_name and c.service.catalog_type == service_type
       end or raise ActiveRecord::RecordNotFound, "no such resource"
 
-      domain = services_ng.resource_management.find_domain(@scoped_domain_id, services: service_type, resources: resource_name.to_s)
+      domain = services_ng.resource_management.find_domain(@scoped_domain_id, service: service_type, resource: resource_name.to_s)
       @domain_resource = domain.resources.first or raise ActiveRecord::RecordNotFound, "no such domain"
-      projects = services_ng.resource_management.list_projects(@scoped_domain_id, services: service_type, resources: resource_name.to_s)
+      projects = services_ng.resource_management.list_projects(@scoped_domain_id, service: service_type, resource: resource_name.to_s)
       @project_resources = projects.map { |p| p.resources.first }.reject(&:nil?)
 
       # show danger and warning projects on top if no sort by is given
@@ -328,8 +328,8 @@ module ResourceManagement
     def load_project_resource
       project = services_ng.resource_management.find_project(
         @scoped_domain_id, params.require(:id),
-        services: [ params.require(:service) ],
-        resources: [ params.require(:resource) ],
+        service: [ params.require(:service) ],
+        resource: [ params.require(:resource) ],
       ) or raise ActiveRecord::RecordNotFound, "project #{params[:project]} not found"
       @project_resource = project.resources.first or raise ActiveRecord::RecordNotFound, "resource not found"
     end
@@ -338,8 +338,8 @@ module ResourceManagement
       enforce_permissions(":resource_management:domain_admin_list")
       @resource = services_ng.resource_management.find_domain(
         @scoped_domain_id,
-        services: Array.wrap(params.require(:service)),
-        resources: Array.wrap(params.require(:resource)),
+        service: Array.wrap(params.require(:service)),
+        resource: Array.wrap(params.require(:resource)),
       ).resources.first or raise ActiveRecord::RecordNotFound
     end
 
@@ -359,14 +359,14 @@ module ResourceManagement
 
       @project_resource = services_ng.resource_management.find_project(
         @scoped_domain_id, @inquiry.project_id,
-        services:  [ data[:service]  ],
-        resources: [ data[:resource] ],
+        service:  [ data[:service]  ],
+        resource: [ data[:resource] ],
       ).resources.first or raise ActiveRecord::RecordNotFound
 
       @domain_resource = services_ng.resource_management.find_domain(
         @scoped_domain_id,
-        services:  [ data[:service]  ],
-        resources: [ data[:resource] ],
+        service:  [ data[:service]  ],
+        resource: [ data[:resource] ],
       ).resources.first or raise ActiveRecord::RecordNotFound
     end
 

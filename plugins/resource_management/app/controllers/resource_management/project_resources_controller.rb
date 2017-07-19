@@ -37,7 +37,7 @@ module ResourceManagement
       raise ActiveRecord::RecordNotFound, "unknown area #{@area}" if @area_services.empty?
 
       # load all resources for these services
-      @project = services_ng.resource_management.find_project(@scoped_domain_id, @scoped_project_id, services: @area_services.map(&:catalog_type))
+      @project = services_ng.resource_management.find_project(@scoped_domain_id, @scoped_project_id, service: @area_services.map(&:catalog_type))
       @resources = @project.resources
       @min_updated_at = @project.services.map(&:updated_at).min
       @max_updated_at = @project.services.map(&:updated_at).max
@@ -198,8 +198,8 @@ module ResourceManagement
     def load_project_resource
       @resource = services_ng.resource_management.find_project(
         @scoped_domain_id, @scoped_project_id,
-        services: Array.wrap(params.require(:service)),
-        resources: Array.wrap(params.require(:resource)),
+        service: Array.wrap(params.require(:service)),
+        resource: Array.wrap(params.require(:resource)),
       ).resources.first or raise ActiveRecord::RecordNotFound
     end
 

@@ -17,8 +17,8 @@ module ServiceLayerNg
       project = find_project( 
         domain_id,
         project_id,
-        services: options.collect { |values| values[:service_type] },
-        resources: options.collect { |values| values[:resource_name] },
+        service: options.collect { |values| values[:service_type] },
+        resource: options.collect { |values| values[:resource_name] },
       )
 
       result = []
